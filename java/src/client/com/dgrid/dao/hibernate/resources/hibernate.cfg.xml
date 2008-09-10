@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+          "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+		<mapping resource="com/dgrid/dao/hibernate/resources/Host.hbm.xml" />
+		<mapping resource="com/dgrid/dao/hibernate/resources/HostSetting.hbm.xml" />
+		<mapping resource="com/dgrid/dao/hibernate/resources/Job.hbm.xml" />
+		<mapping resource="com/dgrid/dao/hibernate/resources/Joblet.hbm.xml" />
+		<mapping resource="com/dgrid/dao/hibernate/resources/JobletLogEntry.hbm.xml" />
+		<mapping resource="com/dgrid/dao/hibernate/resources/JobletResult.hbm.xml" />
+		<mapping resource="com/dgrid/dao/hibernate/resources/SystemSetting.hbm.xml" />
+    </session-factory>
+</hibernate-configuration>

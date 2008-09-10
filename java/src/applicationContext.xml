@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+    
+    <!-- Enable @Transactional support -->
+    <tx:annotation-driven/>
+
+    <!-- Enable @AspectJ support -->
+    <aop:aspectj-autoproxy/>
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <!--<tx:method name="get*" read-only="true"/>-->
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:advisor id="managerTx0" advice-ref="txAdvice" pointcut="execution(* *..dao.hibernate.GenericHibernateDAO.*(..))"/>
+        <aop:advisor id="managerTx" advice-ref="txAdvice" pointcut="execution(* *..transport.DGridHibernateTransport.*(..))"/>
+        <!--<aop:advisor id="managerTx1" advice-ref="txAdvice" pointcut="execution(* *..service.*Service.*(..))"/>-->
+    </aop:config>
+
+    <!-- config -->
+    <bean
+            id="propertyConfigurator"
+            class="com.dgrid.helpers.impl.PropertyConfiguratorImpl">
+        <property name="location">
+            <value>classpath:/dgrid.properties</value>
+        </property>
+    </bean>
+
+    <bean
+            id="mailSender"
+            class="com.dgrid.helpers.impl.MailSenderImpl"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+
+    <!-- http client helper -->
+    <bean
+            id="httpClientHelper"
+            class="com.dgrid.helpers.impl.HttpClientHelperImpl"
+            lazy-init="true">
+        <property name="userAgent" value="${httpClient.userAgent}"/>
+        <property name="maxRedirects" value="${httpClient.maxRedirects}"/>
+        <property name="allowCircularRedirects" value="${httpClient.allowCircularRedirects}"/>
+        <property name="proxyHost" value="${httpClient.proxyHost}"/>
+        <property name="proxyPort" value="${httpClient.proxyPort}"/>
+    </bean>
+
+    <!-- Amazon S3 client helper -->
+    <bean
+            id="s3Helper"
+            class="com.dgrid.helpers.impl.S3HelperImpl"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+
+    <!-- Amazon SQS client helper -->
+    <bean
+            id="sqsHelper"
+            class="com.dgrid.helpers.impl.SQSHelperImpl"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+
+    <!-- Amazon EC2 client helper -->
+    <bean
+            id="ec2Helper"
+            class="com.dgrid.helpers.impl.EC2HelperImpl"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+
+    <!-- systems adapter -->
+    <bean
+            id="systemsAdapter"
+            class="com.dgrid.service.impl.DGridSystemsAdapterLinux"
+            lazy-init="true">
+    </bean>
+
+    <!-- ec2 systems adapter -->
+    <!--<bean
+            id="systemsAdapter"
+            class="com.dgrid.service.impl.DGridSystemsAdapterEC2"
+            lazy-init="true">
+        <property name="ec2Helper" ref="ec2Helper"/>
+    </bean>-->
+
+    <!-- systems adapter factory -->
+    <bean
+            id="systemsAdapterFactory"
+            class="com.dgrid.service.impl.DGridSystemsAdapterFactoryImpl"
+            lazy-init="true">
+        <property name="systemsAdapter" ref="systemsAdapter"/>
+    </bean>
+
+    <!-- fork/join helper -->
+    <bean
+            id="forkJoinHelper"
+            class="com.dgrid.helpers.impl.ForkJoinHelperImpl"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+
+    <!-- dummy transport -->
+    <bean
+            id="dummy"
+            class="com.dgrid.transport.DGridDummyTransport"
+            scope="singleton"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+
+    <!-- hibernate-based jdbc transport -->
+    <bean
+            id="hibernate"
+            class="com.dgrid.transport.DGridHibernateTransport"
+            scope="singleton"
+            init-method="init"
+            lazy-init="true">
+        <property name="genericDAO" ref="genericDAO"/>
+        <property name="objectQueryDAO" ref="objectQueryDAO"/>
+        <property name="apiKey" value="${transport.apiKey}"/>
+    </bean>
+
+    <!-- thrift-based transport -->
+    <bean
+            id="thrift"
+            class="com.dgrid.transport.DGridThriftTransport"
+            scope="singleton"
+            init-method="init"
+            lazy-init="true">
+        <property name="apiKey" value="${transport.apiKey}"/>
+        <property name="endpoint" value="${transport.endpoint}"/>
+        <property name="port" value="${transport.port}"/>
+    </bean>
+
+    <!-- transport that adds encryption and digital signature for joblet contents
+        w/ a delegate to the backing transport -->
+    <bean
+            id="encrypted"
+            class="com.dgrid.transport.DGridEncryptedTransport"
+            scope="singleton"
+            init-method="init"
+            lazy-init="true">
+        <property name="delegate" ref="${encryptedTransport.delegate}"/>
+        <property name="privateKey" value="${privateKeyPath}"/>
+        <property name="publicKey" value="${publicKeyPath}"/>
+    </bean>
+
+    <!-- plugin context -->
+    <bean
+            id="pluginContext"
+            class="com.dgrid.service.impl.DGridPluginContextImpl"
+            scope="singleton">
+        <property name="gridClient" ref="gridClient"/>
+        <property name="threadPool" ref="threadPool"/>
+    </bean>
+
+    <!-- plugin manager -->
+    <bean
+            id="pluginManager"
+            class="com.dgrid.service.impl.DGridPluginManagerImpl"
+            scope="singleton"
+            destroy-method="stop">
+        <property name="pluginContext" ref="pluginContext"/>
+        <property name="propertyConfigurator" ref="propertyConfigurator"/>
+    </bean>
+
+    <!-- primary grid client class -->
+    <bean
+            id="gridClient"
+            class="com.dgrid.service.impl.DGridClientImpl"
+            scope="singleton">
+        <property name="transport" ref="${transport.type}"/>
+        <property name="pluginManager" ref="pluginManager"/>
+    </bean>
+
+    <!-- thread pool -->
+    <bean
+            id="threadPool"
+            class="com.dgrid.service.impl.DGridExecutorServiceImpl"
+            scope="singleton">
+        <constructor-arg index="0">
+            <value>${threadPool.maxCpuCores}</value>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value>${threadPool.threadsPerCore}</value>
+        </constructor-arg>
+    </bean>
+
+    <!-- xmpp connection -->
+    <bean
+            id="xmppConnection"
+            class="com.dgrid.service.impl.SmackXMPPConnectionImpl"
+            scope="singleton"
+            lazy-init="true">
+    </bean>
+
+    <!-- processor daemon -->
+    <bean
+            id="dgridProcessor"
+            class="com.dgrid.service.impl.DGridProcessorImpl"
+            scope="singleton"
+            lazy-init="true">
+        <property name="pluginManager" ref="pluginManager"/>
+        <property name="gridClient" ref="gridClient"/>
+        <property name="threadPool" ref="threadPool"/>
+        <property name="threadsPerCore" value="${threadPool.threadsPerCore}"/>
+        <property name="sleepTime" value="${processor.sleepTime}"/>
+    </bean>
+
+</beans>

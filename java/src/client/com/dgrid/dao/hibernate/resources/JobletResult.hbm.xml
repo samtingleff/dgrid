@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+	<class name="com.dgrid.gen.JobletResult" table="joblet_results">
+		<id name="id" type="integer" column="id">
+			<generator class="native"/>
+		</id>
+		<property name="returnCode" column="return_code" not-null="true"/>
+		<property name="walltime" column="walltime" not-null="true"/>
+		<property name="status" column="status" not-null="true"/>
+		<property name="details" column="details" not-null="false" type="text"/>
+		<many-to-one name="joblet" column="joblet_id" not-null="true" unique="true"/>
+	</class>
+</hibernate-mapping>

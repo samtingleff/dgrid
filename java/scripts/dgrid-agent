@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# these can all be overwritten by /etc/default/dgrid-agent
+JAVA_HOME=/usr/local/java
+DGRID_APP_ROOT=`pwd`
+JAVA_OPTS="-Djava.awt.headless=true -Xms20m -Xmx128m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:NewSize=10m -XX:MaxNewSize=10m -XX:SurvivorRatio=6 -XX:TargetSurvivorRatio=80"
+
+# Read configuration variable file if it is present
+# See scripts/etc-default-dgrid-agent for sample
+[ -r /etc/default/dgrid-agent ] && . /etc/default/dgrid-agent
+
+if [ -x $JAVA_HOME/bin/java ]
+then
+  JAVA=$JAVA_HOME/bin/java
+else
+  JAVA=`which java`
+fi
+
+if [ -x $JAVA ]
+then
+  echo -n ''
+else
+  echo "Cannot find java from $JAVA"
+  exit
+fi
+
+echo "starting in $DGRID_APP_ROOT"
+cd $DGRID_APP_ROOT
+
+retval=0
+do_start()
+{
+ echo starting up
+ $JAVA $JAVA_OPTS -jar dgrid-agent.jar
+ retval=$?
+ if [ $retval = 100 ]; then
+  do_start
+ fi
+}
+
+do_start

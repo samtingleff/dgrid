@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+	<class name="com.dgrid.gen.Joblet" table="joblets">
+		<id name="id" type="integer" column="id">
+			<generator class="native"/>
+		</id>
+		<property name="timeCreated" column="time_created" not-null="true"/>
+		<property name="jobId" column="job_id" not-null="true"/>
+		<property name="hostId" column="host_id" not-null="false"/>
+		<property name="submitter" column="submitter" not-null="true" length="50"/>
+		<property name="priority" column="priority" not-null="true"/>
+		<property name="jobletType" column="type" not-null="true" length="20"/>
+		<property name="description" column="description" not-null="false" length="255"/>
+		<map name="parameters" table="joblet_parameters" cascade="all">
+			<key column="parent_id"/>
+			<index column="parameter_name" type="string" length="100"/>
+			<element column="parameter_value" type="string" length="255"/>
+        </map>
+		<property name="content" column="content" not-null="false" type="text"/>
+		<property name="status" column="status" not-null="true"/>
+	</class>
+</hibernate-mapping>

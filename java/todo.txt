@@ -1,0 +1,115 @@
+Save/provision jobs
+ - use in callback type handler
+
+EC2SystemsAdapter
+ - inherits from SystemsAdapter
+ - plugin
+ - provides shutdown, launch, etc. operations
+
+Need to do 'select ... for update' on getWork()
+
+Send jobs to _all_ systems in a group
+
+Allow multiple thrift servers
+
+mysql-based client queue
+
+Change xmpp behavior to only allow connection requests from xmpp.admins (comma-separated list of jids)
+
+Move things out of api and api.impl package
+
+Add host group to facts db as group.name
+
+Die on more than x errors in y minutes
+
+plugins for AWS operations
+ - S3 joblet (done)
+ - SQS joblet
+ - EC2 joblet
+
+lock() and notify() not exactly working
+ - done (? - seem okay now but keep an eye out)
+
+Need threadCount back in discovery joblet
+ - done (?) but messy
+
+Validate api keys
+ - done
+
+TransportFactory used by ant client
+ - done
+
+HttpClientJoblet
+ - done
+
+Delete option in s3.put
+ - done
+
+S3 list bucket operation
+ - done
+
+S3 list bucket contents operation
+ - done
+
+File joblet to write out a new file
+ - done
+
+Use a URLClassLoader to allow external libs. Could be specific to the plugin class loader.
+ - done
+
+Callbacks
+ - done
+
+Use a param 'script' for python and groovy joblets
+ - done
+
+xmpp plugin should call setFacts() to set an xmpp.jid value
+ - done
+
+Set joblet status to 'p' just before we start to execute.
+ - done
+
+Set the java -X param for using graphics 2d in headless environment
+ - done
+
+Threadcount field in joblet
+ - done
+
+System joblet should return failure if non-zero exit value
+ - done
+
+Junit plugin
+ - done
+
+Groovy plugin
+ - done
+
+Smack/xmpp plugin
+ - done
+
+Listeners
+ - done
+
+Dummy transport
+ - done
+
+Return standard out/stderr with system joblets
+ - done
+
+Spring
+ - Done
+
+DShell
+ - done
+
+HostSettings
+ - done
+
+Dynamic external plugins
+ - done
+
+Collect cpu core info
+ - done
+
+Move thrift code behind the DGridTransport interface
+ - done

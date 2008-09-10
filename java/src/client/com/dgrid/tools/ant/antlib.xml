@@ -1,0 +1,3 @@
+<antlib>
+  <taskdef name="dgrid-job" classname="com.dgrid.driver.AntJobTask"/>
+</antlib>

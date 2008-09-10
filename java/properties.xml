@@ -1,0 +1,27 @@
+<!-- Define properties used in build.xml -->
+
+<!-- General configuration -->
+
+<property file="build.properties"/>
+<property name="agent-jar" value="dgrid-agent"/>
+<property name="dshell-jar" value="dshell"/>
+<property name="version" value="0.0.1"/>
+<property name="src" value="src"/>
+<property name="build" value="bin"/>
+<property name="plugins" value="plugins"/>
+<property name="dist" value="."/>
+<property name="libs" value="lib"/>
+<property name="agent-jarfile" value="${agent-jar}.jar"/>
+<property name="dshell-jarfile" value="${dshell-jar}.jar"/>
+<property name="tarfile" value="${agent-jar}-${version}-dist.tgz"/>
+
+<!-- Load user overrides -->
+<property file="${user.home}/.${ant.project.name}-build.properties"/>
+<property file="${user.home}/.build.properties"/>
+<property file="build.properties"/>
+
+<path id="compile.classpath">
+	<fileset dir="${libs}" includes="*.jar"/>
+	<fileset dir="${libs}/hibernate-3.3.0-sp1" includes="*.jar"/>
+	<fileset dir="${libs}/ext" includes="*.jar"/>
+</path>

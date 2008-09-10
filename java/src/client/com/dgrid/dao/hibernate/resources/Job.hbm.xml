@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+	<class name="com.dgrid.gen.Job" table="jobs">
+		<id name="id" type="integer" column="id">
+			<generator class="native"/>
+		</id>
+		<property name="submitter" column="submitter" not-null="true" length="50"/>
+		<property name="description" column="description" not-null="false" length="255"/>
+		<list name="joblets" cascade="delete">
+			<key column="job_id"/>
+			<list-index column="list_index"/>
+			<one-to-many class="com.dgrid.gen.Joblet"/>
+		</list>
+		<property name="callbackType" column="callback_type" not-null="false"/>
+		<property name="callbackAddress" column="callback_address" not-null="false" length="255"/>
+		<property name="callbackContent" column="callback_content" not-null="false" length="500"/>
+		<property name="status" column="status" not-null="true"/>
+	</class>
+</hibernate-mapping>

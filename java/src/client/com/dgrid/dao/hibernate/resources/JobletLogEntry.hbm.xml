@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+	<class name="com.dgrid.dao.model.JobletLogEntry" table="joblet_logs">
+		<id name="id" type="integer" column="id">
+			<generator class="native"/>
+		</id>
+		<many-to-one name="joblet" column="joblet_id" not-null="true"/>
+		<property name="message" column="message" not-null="true" length="255"/>
+	</class>
+</hibernate-mapping>

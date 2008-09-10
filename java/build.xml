@@ -1,0 +1,136 @@
+<!DOCTYPE project [
+	<!ENTITY properties SYSTEM "./properties.xml">
+]>
+
+<project name="dgrid-java" default="jar" basedir=".">
+	<!-- import project-wide properties (classpath, jar file locations) -->
+	&properties;
+
+	<target name="init">
+		<tstamp/>
+		<mkdir dir="${build}"/>
+		<mkdir dir="${plugins}/java"/>
+		<taskdef name="groovyc"
+				classname="org.codehaus.groovy.ant.Groovyc"
+				classpathref="compile.classpath"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<copy todir="${build}" overwrite="true">
+			<fileset dir="${src}" includes="*.properties,*.xml"/>
+			<fileset dir="${src}/api" includes="*.properties,*.xml,**/*.properties,**/*.xml"/>
+			<fileset dir="${src}/client" includes="*.properties,*.xml,**/*.properties,**/*.xml"/>
+			<fileset dir="${src}/plugins" includes="*.properties,*.xml,**/*.properties,**/*.xml"/>
+			<fileset dir="${src}/groovy" includes="*.properties,*.xml,**/*.properties,**/*.xml"/>
+			<fileset dir="${src}/test" includes="*.properties,*.xml,**/*.properties,**/*.xml"/>
+		</copy>
+		<javac
+			srcdir="${src}"
+			destdir="${build}"
+			debug="on"
+			target="1.5"
+			classpathref="compile.classpath">
+		</javac>
+		<groovyc
+			srcdir="${src}/groovy"
+			destdir="${build}">
+			<classpath>
+				<pathelement path="${build}"/>
+				<path refid="compile.classpath"/>
+			</classpath>
+		</groovyc>
+		<groovyc
+			srcdir="plugins/groovy"
+			destdir="${build}">
+			<classpath>
+				<pathelement path="${build}"/>
+				<path refid="compile.classpath"/>
+			</classpath>
+		</groovyc>
+	</target>
+
+	<target name="task-defs" depends="compile">
+		<typedef resource="com/dgrid/tools/ant/antlib.xml">
+			<classpath>
+				<pathelement path="${build}"/>
+				<pathelement location="lib/spring-2.5.4.jar"/>
+				<path refid="compile.classpath"/>
+			</classpath>
+		</typedef>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${agent-jarfile}"
+			basedir="${build}"
+			includes="**/**"
+			excludes="com/dgrid/plugins/**/*,com/dgrid/handlers/**/*"
+			manifest="${src}/dgrid-agent-manifest.mf"/>
+		<jar destfile="${dshell-jarfile}"
+			basedir="${build}"
+			includes="**/**"
+			manifest="${src}/dgrid-dshell-manifest.mf"/>
+	</target>
+
+	<target name="plugins" depends="compile">
+		<jar destfile="${plugins}/java/default-types.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/DefaultTypeHandlerPlugin.class,com/dgrid/handlers/**/*"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/DefaultTypeHandlerPlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/mapreduce-java.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/JavaMapReducePlugin.class,com/dgrid/handlers/JavaMapReduceTypeHandler.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/JavaMapReducePlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/mapreduce-groovy.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/GroovyMapReducePlugin.class,com/dgrid/handlers/GroovyMapReduceTypeHandler.class,com/dgrid/handlers/JavaMapReduceTypeHandler.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/GroovyMapReducePlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/sync-jobservice.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/SyncJobServicePlugin*.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/SyncJobServicePlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/dgrid-junit.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/JunitPlugin.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/JunitPlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/groovy-scripts.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/GroovyScriptPlugin.class,com/dgrid/handlers/GroovyJobletTypeHandler.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/GroovyScriptPlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/groovy-plugins.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/GroovyPluginsPlugin*.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/GroovyPluginsPlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/xmpp.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/XmppPlugin.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/XmppPlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/javascript.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/JavascriptPlugin.class,com/dgrid/handlers/JavascriptJobletTypeHandler.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/JavascriptPlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/dataSource.jar"
+			basedir="${build}"
+			includes="com/dgrid/plugins/DataSourcePlugin.class"
+			manifest="${src}/plugins/com/dgrid/plugins/manifest/DataSourcePlugin-manifest.mf"/>
+		<jar destfile="${plugins}/java/sample.jar"
+			basedir="${build}"
+			includes="com/dgrid/test/plugins/**/*"
+			manifest="${src}/test/com/dgrid/test/plugins/SimpleJavaPlugin-Manifest.mf"/>
+	</target>
+
+	<target name="tgz" depends="jar,plugins">
+		<tar destfile="${tarfile}" compression="gzip">
+			<tarfileset dir="${dist}" includes="${agent-jarfile},${dshell-jarfile}"/>
+			<tarfileset dir="." includes="init-scripts/**/*" excludes=".svn" filemode="755"/>
+			<tarfileset dir="." includes="scripts/**/*" excludes=".svn" filemode="755"/>
+			<tarfileset dir="." includes="plugins/**/*" excludes=".svn"/>
+			<tarfileset dir="." includes="${libs}/**/*.jar"/>
+		</tar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build}"/>
+	</target>
+
+	<target name="rebuild" depends="clean,compile"/>
+</project>

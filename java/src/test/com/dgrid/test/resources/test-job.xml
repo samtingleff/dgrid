@@ -1,0 +1,26 @@
+<job
+  id="0"
+  submitter="sam"
+  description="test joblet"
+  callbackType="4"
+  callbackAddress="sam@stevie.samnbree.net"
+  callbackContent="Ant callback"
+  status="2">
+
+ <joblet
+   id="0"
+   job-id="0"
+   submitter="sam"
+   priority="1"
+   expected-walltime="3600"
+   thread-count="1"
+   type="system"
+   description="job joblet"
+   status="0">
+  <parameters>
+   <property name="output" value="true"/>
+  </parameters>
+  echo -n hello
+ </joblet>
+
+</job>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+	<class name="com.dgrid.dao.model.SystemSetting" table="system_settings">
+		<id name="id" type="integer" column="id">
+			<generator class="native"/>
+		</id>
+		<property name="timeCreated" column="time_created" not-null="true"/>
+		<property name="name" column="setting_name" not-null="true" unique="true" length="140"/>
+		<property name="value" column="setting_value" not-null="true" length="255"/>
+		<property name="description" column="description" not-null="false" length="255"/>
+	</class>
+</hibernate-mapping>
