@@ -14,8 +14,7 @@ public class ImageScaler {
 	 * 
 	 * @param source
 	 * @param dest
-	 * @param encoding:
-	 *            either png, jpg or gif
+	 * @param encoding
 	 * @param width
 	 * @param height
 	 * @throws IOException

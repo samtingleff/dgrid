@@ -16,7 +16,7 @@ public class Execute {
 	 * Execute a process and log stdout/stderr
 	 * 
 	 * @param cmd
-	 * @return
+	 * @return return code of the command
 	 * @throws IOException
 	 * @throws ConversionFailedException
 	 * @throws InterruptedException
@@ -35,7 +35,7 @@ public class Execute {
 	 * Execute a process and log stdout/stderr
 	 * 
 	 * @param cmd
-	 * @return
+	 * @return return code of the command
 	 * @throws IOException
 	 * @throws ConversionFailedException
 	 * @throws InterruptedException

@@ -155,6 +155,7 @@
             init-method="init"
             lazy-init="true">
         <property name="delegate" ref="${encryptedTransport.delegate}"/>
+        <property name="desKeyPath" value="${desKeyPath}"/>
         <property name="privateKey" value="${privateKeyPath}"/>
         <property name="publicKey" value="${publicKeyPath}"/>
     </bean>

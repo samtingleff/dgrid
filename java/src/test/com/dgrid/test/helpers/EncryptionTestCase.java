@@ -1,30 +1,73 @@
 package com.dgrid.test.helpers;
 
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import junit.framework.TestCase;
+
 import com.dgrid.util.Base64Encoder;
 import com.dgrid.util.Encryption;
-
-import junit.framework.TestCase;
+import com.dgrid.util.io.InputStreamUtils;
 
 public class EncryptionTestCase extends TestCase {
 
 	public void testRSAPK() throws Exception {
 		String plaintext = "Hello, world!";
-		KeyPair kp = Encryption.generateKey(Encryption.RSA,
+		KeyPair kp = Encryption.generateKeyPair(Encryption.RSA,
 				Encryption.DEFAULT_KEY_SIZE);
 		String ciphertext = Encryption.encryptStringBase64(plaintext,
-				Encryption.RSA, kp.getPublic());
+				Encryption.RSA_PADDED, kp.getPublic());
 		String decrypted = Encryption.decryptStringBase64(ciphertext,
-				Encryption.RSA, kp.getPrivate());
+				Encryption.RSA_PADDED, kp.getPrivate());
+		assertEquals(decrypted, plaintext);
+	}
+
+	public void testDES() throws Exception {
+		String plaintext = "Hello, world!";
+		Key secret = Encryption.generateSecretKey(Encryption.DES);
+		String ciphertext = Encryption.encryptStringBase64(plaintext,
+				Encryption.DES, secret);
+		String decrypted = Encryption.decryptStringBase64(ciphertext,
+				Encryption.DES, secret);
+		assertEquals(decrypted, plaintext);
+
+		// test a short string
+		plaintext = "1";
+		ciphertext = Encryption.encryptStringBase64(plaintext, Encryption.DES,
+				secret);
+		decrypted = Encryption.decryptStringBase64(ciphertext, Encryption.DES,
+				secret);
+		assertEquals(decrypted, plaintext);
+
+		// test a long string
+		// this file is 44k of base64 encoded data from /dev/urandom
+		plaintext = InputStreamUtils
+				.getInputStreamAsString(getClass().getResourceAsStream(
+						"/com/dgrid/test/resources/long-file.txt"));
+		ciphertext = Encryption.encryptStringBase64(plaintext, Encryption.DES,
+				secret);
+		decrypted = Encryption.decryptStringBase64(ciphertext, Encryption.DES,
+				secret);
+		assertEquals(decrypted, plaintext);
+
+		// test key serialization
+		String keyString = new String(Base64Encoder.base64Encode(secret
+				.getEncoded()));
+		secret = Encryption.getSecretKey(Encryption.DES, Base64Encoder
+				.base64Decode(keyString.getBytes()));
+		plaintext = "Callback test contents";
+		ciphertext = Encryption.encryptStringBase64(plaintext,
+				Encryption.DES_PADDED, secret);
+		decrypted = Encryption.decryptStringBase64(ciphertext,
+				Encryption.DES_PADDED, secret);
 		assertEquals(decrypted, plaintext);
 	}
 
 	public void testRSASignature() throws Exception {
 		String plaintext = "Hello, world!";
-		KeyPair kp = Encryption.generateKey(Encryption.RSA,
+		KeyPair kp = Encryption.generateKeyPair(Encryption.RSA,
 				Encryption.DEFAULT_KEY_SIZE);
 		byte[] sig = Encryption.sign(plaintext.getBytes(), kp.getPrivate(),
 				Encryption.SHA1withRSA);
@@ -40,7 +83,7 @@ public class EncryptionTestCase extends TestCase {
 
 	public void testKeySerializer() throws Exception {
 		String plaintext = "Hello, world!";
-		KeyPair kp = Encryption.generateKey(Encryption.RSA,
+		KeyPair kp = Encryption.generateKeyPair(Encryption.RSA,
 				Encryption.DEFAULT_KEY_SIZE);
 		String b64privateKey = new String(Base64Encoder.base64Encode(kp
 				.getPrivate().getEncoded()));

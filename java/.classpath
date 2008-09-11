@@ -41,5 +41,6 @@
 	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/slf4j-log4j12-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/aspectjweaver-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk16-140.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

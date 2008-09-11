@@ -1,6 +1,7 @@
 package com.dgrid.transport;
 
 import java.io.File;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -31,11 +32,15 @@ public class DGridEncryptedTransport implements DGridTransport {
 
 	private DGridTransport delegate;
 
+	private String desKeyPath;
+
 	private String privateKeyPath;
 
 	private String publicKeyPath;
 
 	private KeyPair kp;
+
+	private Key des;
 
 	public void setDelegate(DGridTransport delegate) {
 		this.delegate = delegate;
@@ -53,6 +58,10 @@ public class DGridEncryptedTransport implements DGridTransport {
 		delegate.setPort(port);
 	}
 
+	public void setDesKeyPath(String path) {
+		this.desKeyPath = path;
+	}
+
 	public void setPrivateKey(String path) {
 		this.privateKeyPath = path;
 	}
@@ -62,9 +71,10 @@ public class DGridEncryptedTransport implements DGridTransport {
 	}
 
 	public void init() throws Exception {
-		Key priv = initKey(privateKeyPath, true);
-		Key pub = initKey(publicKeyPath, false);
+		Key priv = initRSAKey(privateKeyPath, true);
+		Key pub = initRSAKey(publicKeyPath, false);
 		this.kp = new KeyPair((PublicKey) pub, (PrivateKey) priv);
+		this.des = initDESKey();
 	}
 
 	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost {
@@ -121,19 +131,32 @@ public class DGridEncryptedTransport implements DGridTransport {
 	}
 
 	public int submitJob(Job job) throws TransportException, InvalidApiKey {
+		List<Joblet> joblets = job.getJoblets();
+		for (Joblet joblet : joblets) {
+			signJoblet(joblet);
+			encryptJoblet(joblet);
+		}
 		return delegate.submitJob(job);
 	}
 
 	public int submitJoblet(Joblet joblet, int jobId, int callbackType,
 			String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId {
+		signJoblet(joblet);
+		encryptJoblet(joblet);
 		return delegate.submitJoblet(joblet, jobId, callbackType,
 				callbackAddress, callbackContent);
 	}
 
 	public Joblet getWork() throws TransportException, InvalidApiKey,
 			InvalidHost, NoWorkAvailable {
-		return delegate.getWork();
+		Joblet joblet = delegate.getWork();
+		decryptJoblet(joblet);
+		if (!verify(joblet))
+			throw new RuntimeException(String.format(
+					"Could not verify signature on joblet # %1$d", joblet
+							.getId()));
+		return joblet;
 	}
 
 	public void completeJoblet(int jobletId, JobletResult result,
@@ -152,8 +175,7 @@ public class DGridEncryptedTransport implements DGridTransport {
 		delegate.releaseJoblet(jobletId);
 	}
 
-	// TODO: use these
-	private void signJoblet(Joblet joblet) throws Exception {
+	private void signJoblet(Joblet joblet) {
 		if ((joblet.getContent() != null) && (joblet.getContent().length() > 0)) {
 			String sig = Encryption.signString(joblet.getContent(), kp
 					.getPrivate(), Encryption.SHA1withRSA);
@@ -161,33 +183,33 @@ public class DGridEncryptedTransport implements DGridTransport {
 		}
 	}
 
-	private void encryptJoblet(Joblet joblet) throws Exception {
+	private void encryptJoblet(Joblet joblet) throws RuntimeException {
 		if ((joblet.getContent() != null) && (joblet.getContent().length() > 0)) {
 			joblet.setContent(Encryption.encryptStringBase64(joblet
-					.getContent(), Encryption.RSA, kp.getPublic()));
+					.getContent(), Encryption.DES_PADDED, des));
 		}
 		Set<Entry<String, String>> entries = joblet.getParameters().entrySet();
 		for (Entry<String, String> entry : entries) {
 			String encryptedValue = Encryption.encryptStringBase64(entry
-					.getValue(), Encryption.RSA, kp.getPublic());
+					.getValue(), Encryption.DES_PADDED, des);
 			joblet.getParameters().put(entry.getKey(), encryptedValue);
 		}
 	}
 
-	private void decryptJoblet(Joblet joblet) throws Exception {
+	private void decryptJoblet(Joblet joblet) throws RuntimeException {
 		if ((joblet.getContent() != null) && (joblet.getContent().length() > 0)) {
 			joblet.setContent(Encryption.decryptStringBase64(joblet
-					.getContent(), Encryption.RSA, kp.getPrivate()));
+					.getContent(), Encryption.DES_PADDED, des));
 		}
 		Set<Entry<String, String>> entries = joblet.getParameters().entrySet();
 		for (Entry<String, String> entry : entries) {
 			String decryptedValue = Encryption.decryptStringBase64(entry
-					.getValue(), Encryption.RSA, kp.getPrivate());
+					.getValue(), Encryption.DES_PADDED, des);
 			joblet.getParameters().put(entry.getKey(), decryptedValue);
 		}
 	}
 
-	private boolean verify(Joblet joblet) throws Exception {
+	private boolean verify(Joblet joblet) throws RuntimeException {
 		if ((joblet.getContent() == null)
 				|| (joblet.getContent().length() == 0))
 			return true;
@@ -196,7 +218,7 @@ public class DGridEncryptedTransport implements DGridTransport {
 				Encryption.SHA1withRSA, sig);
 	}
 
-	private Key initKey(String path, boolean isPrivateKey) throws Exception {
+	private Key initRSAKey(String path, boolean isPrivateKey) throws Exception {
 		File file = new File(path);
 		Key key = null;
 		if (file.exists()) {
@@ -204,7 +226,7 @@ public class DGridEncryptedTransport implements DGridTransport {
 			key = Encryption.getKey(Base64Encoder.base64Decode(b64Key)
 					.getBytes(), Encryption.RSA, isPrivateKey);
 		} else {
-			KeyPair keyPair = Encryption.generateKey(Encryption.RSA, 1024);
+			KeyPair keyPair = Encryption.generateKeyPair(Encryption.RSA, 1024);
 			OutputStreamUtils.writeStringToFile(new String(Base64Encoder
 					.base64Encode(keyPair.getPrivate().getEncoded())),
 					new File(privateKeyPath));
@@ -216,4 +238,18 @@ public class DGridEncryptedTransport implements DGridTransport {
 		return key;
 	}
 
+	private Key initDESKey() throws Exception {
+		File file = new File(desKeyPath);
+		Key key = null;
+		if (file.exists()) {
+			String b64Key = InputStreamUtils.getFileAsString(file);
+			key = Encryption.getSecretKey(Encryption.DES, Base64Encoder
+					.base64Decode(b64Key.getBytes()));
+		} else {
+			key = Encryption.generateSecretKey(Encryption.DES);
+			OutputStreamUtils.writeStringToFile(new String(Base64Encoder
+					.base64Encode(key.getEncoded())), file);
+		}
+		return key;
+	}
 }

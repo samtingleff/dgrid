@@ -118,7 +118,26 @@
 			manifest="${src}/test/com/dgrid/test/plugins/SimpleJavaPlugin-Manifest.mf"/>
 	</target>
 
-	<target name="tgz" depends="jar,plugins">
+	<target name="docs">
+		<javadoc
+			packagenames="com.dgrid.*"
+			destdir="docs/api"
+			author="true"
+			version="true"
+			use="true">
+			<fileset dir="${src}/api" includes="**/*.java"/>
+			<fileset dir="${src}/gen" includes="**/*.java"/>
+			<classpath>
+				<pathelement path="${build}"/>
+				<path refid="compile.classpath"/>
+			</classpath>
+			<doctitle><![CDATA[<h1>dgrid agent</h1>]]></doctitle>
+			<bottom><![CDATA[<i>Copyright &#169; 2008 Sam Tingleff.</i>]]></bottom>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+		</javadoc>
+	</target>
+
+	<target name="tgz" depends="jar,plugins,docs">
 		<tar destfile="${tarfile}" compression="gzip">
 			<tarfileset dir="${dist}" includes="${agent-jarfile},${dshell-jarfile}"/>
 			<tarfileset dir="." includes="init-scripts/**/*" excludes=".svn" filemode="755"/>

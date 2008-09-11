@@ -32,6 +32,9 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Joblet joblet1 = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVA_JOBLET, "Joblet 1", params, msg1,
 				JOB_STATUS.RECEIVED);
+		params = new HashMap<String, String>(1);
+		params.put(JavaJobletTypeHandler.CLASS_NAME_PARAM, SimpleJavaJob.class
+				.getName());
 		Joblet joblet2 = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVA_JOBLET, "Joblet 2", params, msg2,
 				JOB_STATUS.RECEIVED);
@@ -43,6 +46,9 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		int jobId = gridClient.submitJob(job);
 
 		// submit another joblet to same job
+		params = new HashMap<String, String>(1);
+		params.put(JavaJobletTypeHandler.CLASS_NAME_PARAM, SimpleJavaJob.class
+				.getName());
 		Joblet joblet3 = new Joblet(0, 0l, jobId, 0, getHostname(), 1,
 				Constants.JAVA_JOBLET, "Joblet 3", params, msg2,
 				JOB_STATUS.RECEIVED);
@@ -67,7 +73,6 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Map<String, String> params = new HashMap<String, String>(1);
 		params.put(JavaJobletTypeHandler.CLASS_NAME_PARAM, SimpleJavaJob.class
 				.getName());
-		Map<String, String> hostRequirements = new HashMap<String, String>(0);
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVA_JOBLET, "Joblet 2", params, msg,
 				JOB_STATUS.RECEIVED);
@@ -90,8 +95,6 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		params.put(JavaAppJobletTypeHandler.STATIC_PARAM, Boolean
 				.toString(true));
 
-		Map<String, String> hostRequirements = new HashMap<String, String>(0);
-
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVA_APP_JOBLET, "Joblet 2", params, "",
 				JOB_STATUS.RECEIVED);
@@ -110,11 +113,9 @@ public class DGridWorkerTestCase extends BaseTestCase {
 	public void testSystemJoblet() throws Exception {
 		String msg = "hello, world";
 		String command = String.format("echo -n %1$s", msg);
-		Map<String, String> params = new HashMap<String, String>(2);
+		Map<String, String> params = new HashMap<String, String>(1);
 		params.put(SystemJobletTypeHandler.SAVE_OUTPUT_PARAM, Boolean
 				.toString(true));
-
-		Map<String, String> hostRequirements = new HashMap<String, String>(0);
 
 		Joblet joblet1 = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.SYSTEM_JOBLET, "Simple echo joblet", params, command,
@@ -129,13 +130,14 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		JobletResult result = gridClient.getJobletResult(jobletId);
 		assertEquals(result.getDetails(), msg);
 
+		params = new HashMap<String, String>(1);
 		// again but without wanting standard out
 		params.put(SystemJobletTypeHandler.SAVE_OUTPUT_PARAM, Boolean
 				.toString(false));
 		Joblet joblet2 = new Joblet(0, 0l, 0, 0, getHostname(), 1,
-				Constants.SYSTEM_JOBLET, "Simple echo joblet", params, null,
+				Constants.SYSTEM_JOBLET, "Simple echo joblet", params, command,
 				JOB_STATUS.RECEIVED);
-		jobletId = gridClient.submitJoblet(joblet1, 0);
+		jobletId = gridClient.submitJoblet(joblet2, 0);
 
 		// work it
 		Thread.sleep(1);
@@ -219,7 +221,6 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Map<String, String> params = new HashMap<String, String>(1);
 		params.put(JavaJobletTypeHandler.CLASS_NAME_PARAM, SimpleJavaJob.class
 				.getName());
-		Map<String, String> hostRequirements = new HashMap<String, String>(0);
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVA_JOBLET, "Joblet 2", params, msg,
 				JOB_STATUS.RECEIVED);
