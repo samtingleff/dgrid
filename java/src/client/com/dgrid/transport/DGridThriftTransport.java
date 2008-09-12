@@ -30,7 +30,6 @@ import com.facebook.thrift.transport.TSocket;
 import com.facebook.thrift.transport.TTransport;
 import com.facebook.thrift.transport.TTransportException;
 
-@Deprecated
 public class DGridThriftTransport implements DGridTransport {
 	public static final String NAME = "thrift";
 
@@ -413,11 +412,17 @@ public class DGridThriftTransport implements DGridTransport {
 	private TConnection connect() throws TTransportException {
 		log.trace("connect()");
 		TSocket socket = new TSocket(server, port);
+		TProtocol protocol = new TBinaryProtocol(socket);
+		JobService.Iface jobService = new JobService.Client(protocol);
+		socket.open();
+		return new TConnection(socket, jobService);
+		/*
 		TTransport transport = new TFramedTransport(socket);
 		TProtocol protocol = new TBinaryProtocol(transport);
 		JobService.Iface jobService = new JobService.Client(protocol);
 		transport.open();
 		return new TConnection(transport, jobService);
+		*/
 	}
 
 	private void disconnect(TConnection connection) {

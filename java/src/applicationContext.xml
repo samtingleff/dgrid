@@ -19,15 +19,12 @@
 
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
-            <!--<tx:method name="get*" read-only="true"/>-->
             <tx:method name="*"/>
         </tx:attributes>
     </tx:advice>
 
     <aop:config>
-        <aop:advisor id="managerTx0" advice-ref="txAdvice" pointcut="execution(* *..dao.hibernate.GenericHibernateDAO.*(..))"/>
         <aop:advisor id="managerTx" advice-ref="txAdvice" pointcut="execution(* *..transport.DGridHibernateTransport.*(..))"/>
-        <!--<aop:advisor id="managerTx1" advice-ref="txAdvice" pointcut="execution(* *..service.*Service.*(..))"/>-->
     </aop:config>
 
     <!-- config -->

@@ -8,7 +8,7 @@ public class SQSHelperTestCase extends BaseTestCase {
 
 	public void testSQSHelper() throws Exception {
 		String queueName = String.format(
-				"0A9GVWM7W60MMFQYQP82-test-queue-%1$d", System
+				"1234567890-abcdefghijklm-test-queue-%1$d", System
 						.currentTimeMillis());
 		String msgBody = "Hello, world";
 		SQSHelper sqs = (SQSHelper) super.getBean(SQSHelper.NAME);

@@ -103,10 +103,9 @@ public class SQSHelperImpl implements SQSHelper {
 			com.xerox.amazonws.sqs2.SQSException {
 		log.trace("doGetMessageQueue()");
 		String awsAccessKey = gridClient.getSetting(
-				AWSConstants.AWS_ACCESS_KEY_SETTING, "0A9GVWM7W60MMFQYQP82");
+				AWSConstants.AWS_ACCESS_KEY_SETTING, "");
 		String awsSecretKey = gridClient.getSetting(
-				AWSConstants.AWS_SECRET_KEY_SETTING,
-				"lfNVXWxL+PTYslcmKKAszW1HARL0nPpv8sa6nMyB");
+				AWSConstants.AWS_SECRET_KEY_SETTING, "");
 		MessageQueue msgQueue = SQSUtils.connectToQueue(queue, awsAccessKey,
 				awsSecretKey);
 		return msgQueue;

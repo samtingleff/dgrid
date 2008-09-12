@@ -198,10 +198,9 @@ public class S3HelperImpl implements S3Helper {
 			S3ServiceException {
 		log.trace("getS3Service()");
 		String awsAccessKey = gridClient.getSetting(
-				AWSConstants.AWS_ACCESS_KEY_SETTING, "0A9GVWM7W60MMFQYQP82");
+				AWSConstants.AWS_ACCESS_KEY_SETTING, "");
 		String awsSecretKey = gridClient.getSetting(
-				AWSConstants.AWS_SECRET_KEY_SETTING,
-				"lfNVXWxL+PTYslcmKKAszW1HARL0nPpv8sa6nMyB");
+				AWSConstants.AWS_SECRET_KEY_SETTING, "");
 		AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey,
 				awsSecretKey);
 		S3Service s3Service = new RestS3Service(awsCredentials);
