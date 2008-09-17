@@ -3,11 +3,9 @@ thrift = Packages.com.dgrid.gen;
 plugins = Packages.com.dgrid.plugin;
 
 function execute(joblet, gridClient) {
-	pluginMgr = gridClient.getBean(plugins.PluginManager.NAME);
-	/*
-	xmpp = pluginMgr.getPlugin("XmppPlugin");
-	xmpp.sendTextMessage("sam@jabber.samnbree.net", "", "Hey dude!");
-	*/
+	var x = parseInt(joblet.parameters.get('x'));
+	var y = parseInt(joblet.parameters.get('y'));
+	var result = x + y;
 	return grid.SimpleJobletResult(0, thrift.JOB_STATUS.COMPLETED,
-			joblet.parameters.get("testKey"));
+			result.toString());
 }
