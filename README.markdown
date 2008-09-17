@@ -2,9 +2,9 @@
 
 ## Introduction ##
 
-dgrid is a Java-based worker agent with a plugin system for extensibility. If you have long-running jobs spawned from a web page, an ant task, cron, or whatever... just send it to dgrid and let it run on your compute grid.
+dgrid is a Java-based reliable queue and agent supporting jobs written in Java, Groovy, Javascript, or bash/perl/ruby/etc. dgrid also supports simple MapReduce jobs written in Java or Groovy. For additional info and more marketing-speak, see [http://www.structure28.com/dgrid/]http://www.structure28.com/dgrid/).
 
-dgrid has a serverless mode, where jobs are stored in a relational database, and a client-server mode using a thrift-based protocol. TODO: write that server.
+dgrid has a serverless mode, where jobs are stored in a relational database, and a client-server mode using a thrift-based protocol. TODO: write that server. "Transports" are designed to be pluggable, so an http/json transport or an Amazon AWS transport are likely next steps.
 
 Jobs consist of one or more joblets. Joblets may be system executables (bash/perl/whatever), Java classes, Junit test cases, Groovy classes or Javascript. There are a number of provided joblets for things like uploading/downloading files to/from Amazon S3, sending SQS messages, sending email and sending xmpp messages. These are network-dependent and time consuming tasks that do not need to occur while responding to an http request. See the plugins/groovy/joblets directory for several samples.
 
