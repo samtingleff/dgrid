@@ -1,6 +1,5 @@
 grid = Packages.com.dgrid.api;
 thrift = Packages.com.dgrid.gen;
-plugins = Packages.com.dgrid.plugin;
 
 function execute(joblet, gridClient) {
 	var x = parseInt(joblet.parameters.get('x'));
