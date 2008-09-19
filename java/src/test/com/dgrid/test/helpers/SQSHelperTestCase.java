@@ -18,7 +18,7 @@ public class SQSHelperTestCase extends BaseTestCase {
 		assertNotNull(msgid);
 
 		// sleep for a bit
-		Thread.sleep(1000);
+		Thread.sleep(3000);
 
 		// check queue size
 		int queueSize = sqs.getQueueSize(queueName);
