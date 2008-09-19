@@ -51,6 +51,8 @@ public class DGridHibernateTransport implements DGridTransport {
 
 	private ObjectQueryDAO queryDAO;
 
+	private DGridTransport self;
+
 	private String apiKey;
 
 	private DGridSyncJobServiceImpl syncJobService = new DGridSyncJobServiceImpl();
@@ -68,6 +70,10 @@ public class DGridHibernateTransport implements DGridTransport {
 
 	public void setObjectQueryDAO(ObjectQueryDAO dao) {
 		this.queryDAO = dao;
+	}
+
+	public void setTransport(DGridTransport transport) {
+		this.self = transport;
 	}
 
 	public void setApiKey(String apiKey) {
@@ -145,8 +151,7 @@ public class DGridHibernateTransport implements DGridTransport {
 						"Callback for job # ", params, null,
 						JOB_STATUS.RECEIVED);
 				try {
-					this.submitJoblet(callback, 0, JOB_CALLBACK_TYPES.NONE,
-							null, null);
+					self.submitJoblet(callback, 0, JOB_CALLBACK_TYPES.NONE, null, null);
 				} catch (InvalidJobId e) {
 					log.error("InvalidJobId called while submitting callback!",
 							e);
