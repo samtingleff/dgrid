@@ -25,7 +25,6 @@ import com.dgrid.util.io.HostnameDiscovery;
 import com.facebook.thrift.TException;
 import com.facebook.thrift.protocol.TBinaryProtocol;
 import com.facebook.thrift.protocol.TProtocol;
-import com.facebook.thrift.transport.TFramedTransport;
 import com.facebook.thrift.transport.TSocket;
 import com.facebook.thrift.transport.TTransport;
 import com.facebook.thrift.transport.TTransportException;
@@ -65,16 +64,9 @@ public class DGridThriftTransport implements DGridTransport {
 		this.hostname = HostnameDiscovery.getHostname();
 	}
 
-	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost {
-		log.trace("getHost()");
-		Host host = getHostByName(this.hostname);
-		this.hostid = host.getId();
-		return host;
-	}
-
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost {
-		log.trace("getHost()");
+		log.trace("getHostByName()");
 		TConnection conn = null;
 		try {
 			conn = connect();
@@ -417,12 +409,11 @@ public class DGridThriftTransport implements DGridTransport {
 		socket.open();
 		return new TConnection(socket, jobService);
 		/*
-		TTransport transport = new TFramedTransport(socket);
-		TProtocol protocol = new TBinaryProtocol(transport);
-		JobService.Iface jobService = new JobService.Client(protocol);
-		transport.open();
-		return new TConnection(transport, jobService);
-		*/
+		 * TTransport transport = new TFramedTransport(socket); TProtocol
+		 * protocol = new TBinaryProtocol(transport); JobService.Iface
+		 * jobService = new JobService.Client(protocol); transport.open();
+		 * return new TConnection(transport, jobService);
+		 */
 	}
 
 	private void disconnect(TConnection connection) {

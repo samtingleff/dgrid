@@ -27,8 +27,6 @@ public interface DGridTransport {
 	public Host registerHost(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost;
 
-	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost;
-
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost;
 

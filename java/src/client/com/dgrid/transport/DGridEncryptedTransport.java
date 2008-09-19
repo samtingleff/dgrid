@@ -1,7 +1,6 @@
 package com.dgrid.transport;
 
 import java.io.File;
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -75,10 +74,6 @@ public class DGridEncryptedTransport implements DGridTransport {
 		Key pub = initRSAKey(publicKeyPath, false);
 		this.kp = new KeyPair((PublicKey) pub, (PrivateKey) priv);
 		this.des = initDESKey();
-	}
-
-	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost {
-		return delegate.getHost();
 	}
 
 	public Host registerHost(String hostname) throws TransportException,

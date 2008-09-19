@@ -28,6 +28,7 @@ import com.dgrid.service.DGridClient;
 import com.dgrid.service.DGridPluginManager;
 import com.dgrid.service.DGridTransport;
 import com.dgrid.util.StackTraceUtil;
+import com.dgrid.util.io.HostnameDiscovery;
 
 public class DGridClientImpl implements DGridClient, ApplicationContextAware {
 	protected Log log = LogFactory.getLog(getClass());
@@ -129,7 +130,7 @@ public class DGridClientImpl implements DGridClient, ApplicationContextAware {
 	}
 
 	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost {
-		return transport.getHost();
+		return getHostByName(HostnameDiscovery.getHostname());
 	}
 
 	public Host getHostByName(String hostname) throws TransportException,

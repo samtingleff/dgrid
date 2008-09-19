@@ -81,8 +81,8 @@ public class DGridHibernateTransport implements DGridTransport {
 	}
 
 	public void init() {
+		log.trace("init()");
 		this.hostname = HostnameDiscovery.getHostname();
-
 	}
 
 	public void completeJoblet(int jobletId, JobletResult result,
@@ -153,11 +153,6 @@ public class DGridHibernateTransport implements DGridTransport {
 				}
 			}
 		}
-	}
-
-	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost {
-		log.trace("getHost()");
-		return getHostByName(this.hostname);
 	}
 
 	public Host getHostByName(String hostname) throws TransportException,
@@ -250,7 +245,7 @@ public class DGridHibernateTransport implements DGridTransport {
 	public Joblet getWork() throws TransportException, InvalidApiKey,
 			InvalidHost, NoWorkAvailable {
 		log.trace("getWork()");
-		Host host = getHost();
+		Host host = getHostByName(this.hostname);
 		Criteria crit = queryDAO.createCriteria(Joblet.class);
 		crit.add(Restrictions.eq("status", JOB_STATUS.RECEIVED));
 		crit.add(Restrictions.or(Restrictions.eq("hostId", host.getId()),

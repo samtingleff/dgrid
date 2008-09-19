@@ -71,17 +71,6 @@ public class DGridDummyTransport implements DGridTransport {
 		return h;
 	}
 
-	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost {
-		String hostname = getHostname();
-		Host h = hosts.get(hostname);
-		if (h == null) {
-			h = new Host(random.nextInt(), hostname,
-					new HashMap<String, String>());
-			hosts.put(hostname, h);
-		}
-		return h;
-	}
-
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost {
 		Host h = hosts.get(hostname);
