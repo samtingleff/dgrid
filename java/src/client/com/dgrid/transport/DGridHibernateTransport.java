@@ -38,8 +38,8 @@ import com.dgrid.gen.Joblet;
 import com.dgrid.gen.JobletResult;
 import com.dgrid.gen.NoHostAvailable;
 import com.dgrid.gen.NoWorkAvailable;
+import com.dgrid.service.DGridSyncJobService;
 import com.dgrid.service.DGridTransport;
-import com.dgrid.service.impl.DGridSyncJobServiceImpl;
 import com.dgrid.util.ApiCallbackTypes;
 import com.dgrid.util.io.HostnameDiscovery;
 import com.facebook.thrift.TException;
@@ -51,11 +51,11 @@ public class DGridHibernateTransport implements DGridTransport {
 
 	private ObjectQueryDAO queryDAO;
 
+	private DGridSyncJobService syncJobService;
+
 	private DGridTransport self;
 
 	private String apiKey;
-
-	private DGridSyncJobServiceImpl syncJobService = new DGridSyncJobServiceImpl();
 
 	private static final String[] jobStatusTypes = new String[] { null,
 			"saved", "received", "queued", "processing", "completed", "failed" };
@@ -70,6 +70,10 @@ public class DGridHibernateTransport implements DGridTransport {
 
 	public void setObjectQueryDAO(ObjectQueryDAO dao) {
 		this.queryDAO = dao;
+	}
+
+	public void setSyncJobService(DGridSyncJobService service) {
+		this.syncJobService = service;
 	}
 
 	public void setTransport(DGridTransport transport) {
@@ -151,7 +155,8 @@ public class DGridHibernateTransport implements DGridTransport {
 						"Callback for job # ", params, null,
 						JOB_STATUS.RECEIVED);
 				try {
-					self.submitJoblet(callback, 0, JOB_CALLBACK_TYPES.NONE, null, null);
+					self.submitJoblet(callback, 0, JOB_CALLBACK_TYPES.NONE,
+							null, null);
 				} catch (InvalidJobId e) {
 					log.error("InvalidJobId called while submitting callback!",
 							e);
@@ -279,8 +284,8 @@ public class DGridHibernateTransport implements DGridTransport {
 		int hostNumber = random.nextInt(size);
 		Host host = (Host) crit.list().get(hostNumber);
 		try {
-			JobletResult result = syncJobService.gridExecute(apiKey, host,
-					joblet);
+			JobletResult result = syncJobService.gridExecute(
+					host.getHostname(), joblet);
 			return result;
 		} catch (TException e) {
 			log.error("TException calling gridExecute()", e);

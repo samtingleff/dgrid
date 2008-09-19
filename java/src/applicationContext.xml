@@ -110,6 +110,13 @@
         <property name="gridClient" ref="gridClient"/>
     </bean>
 
+    <!-- synchronous job service -->
+    <bean
+            id="syncJobService"
+            class="com.dgrid.service.impl.DGridSyncJobServiceImpl">
+        <property name="apiKey" value="${transport.apiKey}"/>
+    </bean>
+
     <!-- dummy transport -->
     <bean
             id="dummy"
@@ -128,6 +135,7 @@
             lazy-init="true">
         <property name="genericDAO" ref="genericDAO"/>
         <property name="objectQueryDAO" ref="objectQueryDAO"/>
+        <property name="syncJobService" ref="syncJobService"/>
         <property name="transport" ref="${transport.type}"/>
         <property name="apiKey" value="${transport.apiKey}"/>
     </bean>
@@ -139,6 +147,7 @@
             scope="singleton"
             init-method="init"
             lazy-init="true">
+        <property name="syncJobService" ref="syncJobService"/>
         <property name="apiKey" value="${transport.apiKey}"/>
         <property name="endpoint" value="${transport.endpoint}"/>
         <property name="port" value="${transport.port}"/>

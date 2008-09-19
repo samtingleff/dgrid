@@ -19,8 +19,8 @@ import com.dgrid.gen.Joblet;
 import com.dgrid.gen.JobletResult;
 import com.dgrid.gen.NoHostAvailable;
 import com.dgrid.gen.NoWorkAvailable;
+import com.dgrid.service.DGridSyncJobService;
 import com.dgrid.service.DGridTransport;
-import com.dgrid.service.impl.DGridSyncJobServiceImpl;
 import com.dgrid.util.io.HostnameDiscovery;
 import com.facebook.thrift.TException;
 import com.facebook.thrift.protocol.TBinaryProtocol;
@@ -36,7 +36,7 @@ public class DGridThriftTransport implements DGridTransport {
 
 	private Log log = LogFactory.getLog(getClass());
 
-	private DGridSyncJobServiceImpl syncJobService = new DGridSyncJobServiceImpl();
+	private DGridSyncJobService syncJobService;
 
 	private String hostname;
 
@@ -47,6 +47,10 @@ public class DGridThriftTransport implements DGridTransport {
 	private String apiKey = "123";
 
 	private int hostid = 0;
+
+	public void setSyncJobService(DGridSyncJobService service) {
+		this.syncJobService = service;
+	}
 
 	public void setApiKey(String apiKey) {
 		this.apiKey = apiKey;
@@ -184,7 +188,8 @@ public class DGridThriftTransport implements DGridTransport {
 			Exception e = null;
 			for (int i = 0; i < retries; ++i) {
 				try {
-					result = syncJobService.gridExecute(apiKey, host, joblet);
+					result = syncJobService.gridExecute(host.getHostname(),
+							joblet);
 					break;
 				} catch (Exception e1) {
 					log.warn("Exception in gridExecute()", e1);
