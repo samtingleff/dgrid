@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -55,6 +56,15 @@ public class GenericHibernateDAO extends HibernateDaoSupport implements
 			session.delete(object);
 			return (object);
 		}
+	}
+
+	public int count(Class cls) {
+		log.trace("count()");
+		Session session = super.getSession();
+		Criteria crit = session.createCriteria(cls);
+		crit.setProjection(Projections.rowCount());
+		int rows = ((Integer) crit.uniqueResult()).intValue();
+		return rows;
 	}
 
 	public List list(Class cls, int offset, int max, String orderProperty,

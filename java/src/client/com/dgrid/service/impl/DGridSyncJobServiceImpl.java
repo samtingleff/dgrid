@@ -83,7 +83,8 @@ public class DGridSyncJobServiceImpl implements DGridSyncJobService {
 	private void disconnect(TConnection conn) {
 		log.trace("disconnect()");
 		try {
-			conn.transport.close();
+			if (conn != null)
+				conn.transport.close();
 		} catch (Exception e) {
 			log.warn("Exception calling transport.close()", e);
 		}
