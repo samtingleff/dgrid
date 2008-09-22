@@ -42,5 +42,6 @@
 	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/aspectjweaver-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/bcprov-jdk16-140.jar"/>
 	<classpathentry kind="lib" path="lib/typica-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/java_memcached-release_2.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
