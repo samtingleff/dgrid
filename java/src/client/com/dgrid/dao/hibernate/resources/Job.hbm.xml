@@ -6,6 +6,7 @@
 		<id name="id" type="integer" column="id">
 			<generator class="native"/>
 		</id>
+		<property name="timeCreated" column="time_created" not-null="true"/>
 		<property name="submitter" column="submitter" not-null="true" length="50"/>
 		<property name="description" column="description" not-null="false" length="255"/>
 		<list name="joblets" cascade="delete">
