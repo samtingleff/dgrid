@@ -9,7 +9,7 @@ import com.dgrid.gen.JOB_STATUS;
 import com.dgrid.gen.JobletResult;
 import com.dgrid.service.DGridClient;
 
-class RefreshJoblet implements SimpleJoblet {
+class SimpleGroovyJoblet implements SimpleJoblet {
 	public SimpleJobletResult execute(Joblet joblet, DGridClient gridClient)
 			throws Exception {
 		Map<String, String> params = joblet.parameters;

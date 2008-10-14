@@ -21,29 +21,47 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 
 	public void testS3Joblets() throws Exception {
 		String bucket = String.format("0a9gvwm7w60mmfqyqp82-test");
-		String key = "test_file.txt";
+		String key1 = "test_file.txt";
+		String key2 = "/prefix/test_file.txt";
 		String content = String.format("Test Content beatch (%1$d)", System
 				.currentTimeMillis());
 		File file = File.createTempFile("s3test", ".txt");
-		File file2 = file.createTempFile("s3test", ".txt");
+		File file2 = File.createTempFile("s3test2", ".txt");
 		file2.deleteOnExit();
 		OutputStreamUtils.writeStringToFile(content, file);
+		OutputStreamUtils.writeStringToFile(content, file2);
 
 		// put some content
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("script", "S3Put.groovy");
 		params.put("bucket", bucket);
-		params.put("key", key);
+		params.put("key", key1);
 		params.put("contentType", "text/plain");
 		params.put("public", Boolean.toString(true));
 		params.put("file", file.getAbsolutePath());
 		params.put("delete", Boolean.toString(true));
+		Joblet joblet1 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
+				"Some description", params, content, JOB_STATUS.RECEIVED);
+		int jobletid1 = gridClient.submitJoblet(joblet1, 0);
+
+		// more content
+		params = new HashMap<String, String>();
+		params.put("script", "S3Put.groovy");
+		params.put("bucket", bucket);
+		params.put("key", key2);
+		params.put("contentType", "text/plain");
+		params.put("public", Boolean.toString(true));
+		params.put("file", file2.getAbsolutePath());
+		params.put("delete", Boolean.toString(false));
 		Joblet joblet2 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
 		int jobletid2 = gridClient.submitJoblet(joblet2, 0);
 
+		JobletResult result1 = super.doWork();
+		// work second s3 put
 		JobletResult result2 = super.doWork();
-		String url = result2.getDetails();
+	
+		String url = result1.getDetails();
 		HttpClient client = new HttpClient();
 		HttpMethod method = new GetMethod(url);
 		int returnCode = client.executeMethod(method);
@@ -57,7 +75,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		params = new HashMap<String, String>();
 		params.put("script", "S3Get.groovy");
 		params.put("bucket", bucket);
-		params.put("key", key);
+		params.put("key", key1);
 		params.put("file", file2.getAbsolutePath());
 		Joblet joblet3 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
@@ -66,15 +84,27 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		String content2 = InputStreamUtils.getFileAsString(file2);
 		assertEquals(content2, content);
 
-		// delete it
+		// delete first key
 		params = new HashMap<String, String>();
 		params.put("script", "S3Delete.groovy");
 		params.put("bucket", bucket);
-		params.put("key", key);
+		params.put("key", key1);
 		Joblet joblet4 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
 		int jobletid4 = gridClient.submitJoblet(joblet4, 0);
 		JobletResult result4 = super.doWork();
+		assertEquals(result4.getStatus(), JOB_STATUS.COMPLETED);
+		
+		// delete second key
+		params = new HashMap<String, String>();
+		params.put("script", "S3DeleteKeys.groovy");
+		params.put("bucket", bucket);
+		params.put("prefix", "/prefix/");
+		params.put("delimiter", null);
+		Joblet joblet5 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
+				"Some description", params, content, JOB_STATUS.RECEIVED);
+		int jobletid5 = gridClient.submitJoblet(joblet5, 0);
+		JobletResult result5 = super.doWork();
 		assertEquals(result4.getStatus(), JOB_STATUS.COMPLETED);
 	}
 

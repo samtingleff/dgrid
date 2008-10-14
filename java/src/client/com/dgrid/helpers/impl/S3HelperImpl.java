@@ -105,6 +105,29 @@ public class S3HelperImpl implements S3Helper {
 		}
 	}
 
+	public String[] listKeys(String bucket, String prefix, String delimiter)
+			throws TransportException, IOException, AWSException {
+		log.trace("listKeys()");
+		try {
+			S3Service s3Service = getS3Service();
+			S3Bucket s3bucket = new S3Bucket(bucket);
+			S3Object[] s3objects = s3Service.listObjects(s3bucket, prefix,
+					delimiter);
+			String[] keys = new String[s3objects.length];
+			for (int i = 0; i < s3objects.length; ++i) {
+				keys[i] = s3objects[i].getKey();
+			}
+			return keys;
+		} catch (S3ServiceException e) {
+			throw new AWSException(e);
+		} catch (TransportException e) {
+			throw new AWSException(e);
+		} catch (InvalidApiKey e) {
+			throw new AWSException(e);
+		} finally {
+		}
+	}
+
 	public void get(String bucket, String key, File dest) throws IOException,
 			AWSException {
 		log.trace("get()");

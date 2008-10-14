@@ -11,18 +11,22 @@ import com.dgrid.gen.JOB_STATUS;
 import com.dgrid.gen.JobletResult;
 import com.dgrid.service.DGridClient;
 
-class S3Delete implements SimpleJoblet {
+class S3DeleteKeys implements SimpleJoblet {
 	public SimpleJobletResult execute(Joblet joblet, DGridClient gridClient)
 			throws Exception {
 		Map<String, String> params = joblet.parameters;
 		String bucket = params.get("bucket");
-		String key = params.get("key");
+		String prefix = params.get("prefix");
+		String delimiter = params.get("delimiter");
 
 		assert bucket != null, "Bucket may not be null";
-		assert key != null, "Key may not be null";
+		assert prefix != null, "Prefix may not be null";
 
 		S3Helper s3 = (S3Helper) gridClient.getBean(S3Helper.NAME);
-		s3.delete(bucket, key);
+		String[] keys = s3.listKeys(bucket, prefix, delimiter);
+		for (int i = 0; i < keys.length; ++i) {
+			s3.delete(bucket, keys[i]);
+		}
 		return new SimpleJobletResult(0, JOB_STATUS.COMPLETED, "");
 	}
 }
