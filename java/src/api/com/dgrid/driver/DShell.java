@@ -1,5 +1,6 @@
 package com.dgrid.driver;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.dgrid.gen.JOB_STATUS;
 import com.dgrid.gen.Joblet;
 import com.dgrid.service.DGridClient;
 import com.dgrid.util.ApiCallbackTypes;
+import com.dgrid.util.io.InputStreamUtils;
 
 public class DShell extends BaseDgridDriver {
 	private Log log = LogFactory.getLog(getClass());
@@ -35,6 +37,9 @@ public class DShell extends BaseDgridDriver {
 
 	@Option(name = "--content", usage = "joblet contents (default is empty")
 	private String content = "";
+
+	@Option(name = "--contentFromFile", usage = "joblet contents from filename (default is empty")
+	private String contentFromFile = "";
 
 	@Option(name = "--host", usage = "run on a specific host (default is no)")
 	private String host;
@@ -69,9 +74,12 @@ public class DShell extends BaseDgridDriver {
 		parser.setUsageWidth(80);
 		try {
 			parser.parseArgument(args);
+			String jobletContent = (content.length() > 0) ? content
+					: ((contentFromFile.length() > 0) ? InputStreamUtils
+							.getFileAsString(new File(contentFromFile)) : "");
 			Map<String, String> params = parseMap(paramList);
 			Joblet joblet = new Joblet(0, 0l, jobId, 0, getUser(), priority,
-					jobletType, description, params, content,
+					jobletType, description, params, jobletContent,
 					JOB_STATUS.RECEIVED);
 			int jobletid = 0;
 			String message = null;
