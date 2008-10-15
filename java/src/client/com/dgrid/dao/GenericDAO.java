@@ -14,6 +14,8 @@ public interface GenericDAO {
 
 	public Object delete(Class cls, Serializable id);
 
+	public int count(Class cls);
+
 	public List list(Class cls, int offset, int max, String orderProperty,
 			boolean asc);
 }

@@ -26,6 +26,9 @@ public interface S3Helper {
 	public String[] listKeys(String bucket) throws TransportException,
 			IOException, AWSException;
 
+	public String[] listKeys(String bucket, String prefix, String delimiter)
+			throws TransportException, IOException, AWSException;
+
 	public String put(File file, String bucket, String key, String contentType,
 			boolean isPublic) throws TransportException, IOException,
 			AWSException;
