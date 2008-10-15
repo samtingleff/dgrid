@@ -31,14 +31,30 @@
     <bean
             id="propertyConfigurator"
             class="com.dgrid.helpers.impl.PropertyConfiguratorImpl">
-        <property name="location">
+        <!--<property name="location">
             <value>classpath:/dgrid.properties</value>
+        </property>-->
+        <property name="locations">
+        	<list>
+	            <value>classpath:/dgrid.properties</value>
+	            <value>file:/etc/dgrid.properties</value>
+        	</list>
         </property>
     </bean>
 
     <bean
             id="mailSender"
             class="com.dgrid.helpers.impl.MailSenderImpl"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+
+    <!-- memcache client helper -->
+    <bean
+            id="memcacheHelper"
+            class="com.dgrid.helpers.impl.MemcacheHelperImpl"
+            scope="singleton"
+            init-method="init"
             lazy-init="true">
         <property name="gridClient" ref="gridClient"/>
     </bean>
