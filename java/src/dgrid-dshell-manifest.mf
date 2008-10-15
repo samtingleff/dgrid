@@ -8,6 +8,7 @@ Class-Path: ./lib/args4j-2.0.8.jar
   ./lib/commons-io-1.2.jar
   ./lib/commons-logging-1.1.jar
   ./lib/groovy-all-1.5.6.jar
+  ./lib/java_memcached-release_2.0.1.jar
   ./lib/javamail-1.4.jar
   ./lib/javamail-smtp-1.4.jar
   ./lib/jdom-1.0.jar
