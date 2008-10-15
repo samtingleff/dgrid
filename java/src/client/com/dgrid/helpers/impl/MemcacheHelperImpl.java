@@ -21,7 +21,7 @@ public class MemcacheHelperImpl implements MemcacheHelper {
 
 	private MemCachedClient client = new MemCachedClient();
 
-	public void setDGridClient(DGridClient gridClient) {
+	public void setGridClient(DGridClient gridClient) {
 		this.gridClient = gridClient;
 	}
 
