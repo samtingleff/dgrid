@@ -6,6 +6,7 @@ import java.util.Map;
 import com.danga.MemCached.MemCachedClient;
 
 public interface MemcacheHelper {
+	public static final String NAME = "memcacheHelper";
 
 	public boolean add(String key, Object value);
 
