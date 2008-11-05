@@ -86,6 +86,43 @@ public class EC2HelperImpl implements EC2Helper {
 		}
 	}
 
+	public String allocateAddress() throws TransportException, InvalidApiKey,
+			com.dgrid.errors.EC2Exception {
+		log.trace("allocateAddress()");
+		Jec2 jec2 = getJec2();
+		try {
+			return jec2.allocateAddress();
+		} catch (EC2Exception e) {
+			log.error("EC2Exception in terminateInstances()", e);
+			throw new com.dgrid.errors.EC2Exception(e);
+		}
+	}
+
+	public void associateAddress(String instanceId, String publicIp)
+			throws TransportException, InvalidApiKey,
+			com.dgrid.errors.EC2Exception {
+		log.trace("associateAddress()");
+		Jec2 jec2 = getJec2();
+		try {
+			jec2.associateAddress(instanceId, publicIp);
+		} catch (EC2Exception e) {
+			log.error("EC2Exception in terminateInstances()", e);
+			throw new com.dgrid.errors.EC2Exception(e);
+		}
+	}
+
+	public void disassociateAddress(String publicIp) throws TransportException,
+			InvalidApiKey, com.dgrid.errors.EC2Exception {
+		log.trace("disassociateAddress()");
+		Jec2 jec2 = getJec2();
+		try {
+			jec2.disassociateAddress(publicIp);
+		} catch (EC2Exception e) {
+			log.error("EC2Exception in terminateInstances()", e);
+			throw new com.dgrid.errors.EC2Exception(e);
+		}
+	}
+
 	public Jec2 getJec2() throws TransportException, InvalidApiKey {
 		log.trace("getJec2()");
 		String awsAccessId = gridClient.getSetting(

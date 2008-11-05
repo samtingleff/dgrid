@@ -30,5 +30,14 @@ public interface EC2Helper {
 	public void terminateInstances(String[] instanceIds)
 			throws TransportException, InvalidApiKey, EC2Exception;
 
+	public String allocateAddress() throws TransportException, InvalidApiKey,
+			EC2Exception;
+
+	public void associateAddress(String instanceId, String publicIp)
+			throws TransportException, InvalidApiKey, EC2Exception;
+
+	public void disassociateAddress(String publicIp) throws TransportException,
+			InvalidApiKey, EC2Exception;
+
 	public Jec2 getJec2() throws TransportException, InvalidApiKey;
 }
