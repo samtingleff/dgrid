@@ -143,6 +143,7 @@ public class S3HelperImpl implements S3Helper {
 				fos.write(buffer, 0, read);
 			}
 			fos.close();
+			is.close();
 			s3object.closeDataInputStream();
 		} catch (S3ServiceException e) {
 			throw new AWSException(e);
