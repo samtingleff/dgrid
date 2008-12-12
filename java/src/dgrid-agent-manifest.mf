@@ -21,6 +21,7 @@ Class-Path: ./lib/args4j-2.0.8.jar
   ./lib/smack-3.0.4.jar
   ./lib/smackx-3.0.4.jar
   ./lib/spring-2.5.4.jar
+  ./lib/typica-1.4.1.jar
   ./lib/hibernate-3.3.0-sp1/antlr-2.7.6.jar
   ./lib/hibernate-3.3.0-sp1/aspectjweaver-1.6.1.jar
   ./lib/hibernate-3.3.0-sp1/commons-dbcp-1.2.2.jar

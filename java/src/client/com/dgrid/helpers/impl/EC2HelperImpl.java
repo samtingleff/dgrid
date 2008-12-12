@@ -24,7 +24,7 @@ public class EC2HelperImpl implements EC2Helper {
 
 	private DGridClient gridClient;
 
-	public void setDGridClient(DGridClient gridClient) {
+	public void setGridClient(DGridClient gridClient) {
 		this.gridClient = gridClient;
 	}
 
