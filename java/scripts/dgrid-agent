@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # these can all be overwritten by /etc/default/dgrid-agent
+NICE=10
 JAVA_HOME=/usr/local/java
 DGRID_APP_ROOT=`pwd`
 JAVA_OPTS="-Djava.awt.headless=true -Xms20m -Xmx128m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:NewSize=10m -XX:MaxNewSize=10m -XX:SurvivorRatio=6 -XX:TargetSurvivorRatio=80"
@@ -31,7 +32,7 @@ retval=0
 do_start()
 {
  echo starting up
- $JAVA $JAVA_OPTS -jar dgrid-agent.jar
+ nice -n $NICE $JAVA $JAVA_OPTS -jar dgrid-agent.jar
  retval=$?
  if [ $retval = 100 ]; then
   do_start

@@ -1,5 +1,6 @@
 USER=nobody
 GROUP=nogroup
+NICE=10
 JAVA_HOME=/usr/local/java
 DGRID_APP_ROOT=/opt/local/dgrid-agent
 JAVA_OPTS="-Xms20m -Xmx128m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:NewSize=10m -XX:MaxNewSize=10m -XX:SurvivorRatio=6 -XX:TargetSurvivorRatio=80"
