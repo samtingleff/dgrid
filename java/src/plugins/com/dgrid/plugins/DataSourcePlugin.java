@@ -63,7 +63,7 @@ public class DataSourcePlugin extends BaseDGridPlugin {
 				this.jdbcPassword);
 	}
 
-	public Connection getConnection(String name) throws Exception {
+	public Connection getNamedConnection(String name) throws Exception {
 		DGridClient gridClient = ((DGridPluginContext) super.context)
 				.getGridClient();
 		String driverClass = gridClient.getSetting("dataSource." + name

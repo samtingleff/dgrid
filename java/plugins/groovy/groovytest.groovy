@@ -14,4 +14,8 @@ class GroovyTest extends BaseDGridPlugin {
 	def void stop() {
 		log.trace("stop()")
 	}
+
+	public boolean enabledByDefault() {
+		return false;
+	}
 }
