@@ -16,6 +16,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 
 import com.dgrid.gen.JOB_STATUS;
 import com.dgrid.gen.Joblet;
+import com.dgrid.gen.JobletResult;
 import com.dgrid.service.DGridClient;
 import com.dgrid.util.ApiCallbackTypes;
 import com.dgrid.util.io.InputStreamUtils;
@@ -56,11 +57,15 @@ public class DShell extends BaseDgridDriver {
 	@Option(name = "--param", usage = "set a parameter (name:value)")
 	private List<String> paramList = new ArrayList<String>();
 
+	@Option(name = "--execute", usage = "execute immediately")
+	private boolean execute = false;
+
 	private DGridClient gridClient;
 
 	public static void main(String[] args) throws Exception {
 		DShell shell = new DShell();
-		shell.execute(args);
+		int exitValue = shell.execute(args);
+		System.exit(exitValue);
 	}
 
 	DShell() throws Exception {
@@ -68,10 +73,11 @@ public class DShell extends BaseDgridDriver {
 		gridClient = (DGridClient) ctx.getBean(DGridClient.NAME);
 	}
 
-	public void execute(String[] args) throws Exception {
+	public int execute(String[] args) throws Exception {
 		log.trace("execute()");
 		CmdLineParser parser = new CmdLineParser(this);
 		parser.setUsageWidth(80);
+		int returnCode = 0;
 		try {
 			parser.parseArgument(args);
 			String jobletContent = (content.length() > 0) ? content
@@ -83,12 +89,18 @@ public class DShell extends BaseDgridDriver {
 					JOB_STATUS.RECEIVED);
 			int jobletid = 0;
 			String message = null;
-			if ((host == null) || (host.length() == 0)) {
+			if (execute) {
+				JobletResult result = gridClient.gridExecute(joblet, 1);
+				message = String.format("", result.getReturnCode(), result.getStatus());
+				returnCode = result.getReturnCode();
+			}
+			else if ((host == null) || (host.length() == 0)) {
 				jobletid = gridClient.submitJoblet(joblet, jobId,
 						ApiCallbackTypes.getCallbackType(callbackType),
 						callbackAddress, callbackContent);
 				message = String.format("Joblet submitted with id (%1$d)",
 						jobletid);
+				returnCode = 0;
 			} else {
 				jobletid = gridClient.submitHostJoblet(host, joblet, jobId,
 						ApiCallbackTypes.getCallbackType(callbackType),
@@ -96,14 +108,17 @@ public class DShell extends BaseDgridDriver {
 				message = String.format(
 						"Joblet submitted to host (%1$s) with id (%2$d)", host,
 						jobletid);
+				returnCode = 0;
 			}
 			System.out.println(message);
 		} catch (CmdLineException e) {
 			System.err.println("Usage: dshell [options...] arguments...");
 			parser.printUsage(System.err);
 			log.error("Could not parse options:", e);
+			returnCode = 1;
 		} finally {
 		}
+		return returnCode;
 	}
 
 	private String getUser() {
