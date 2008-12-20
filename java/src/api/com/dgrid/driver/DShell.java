@@ -60,6 +60,9 @@ public class DShell extends BaseDgridDriver {
 	@Option(name = "--execute", usage = "execute immediately")
 	private boolean execute = false;
 
+	@Option(name = "--gridExecute", usage = "grid-execute immediately")
+	private boolean gridExecute = false;
+
 	private DGridClient gridClient;
 
 	public static void main(String[] args) throws Exception {
@@ -90,8 +93,15 @@ public class DShell extends BaseDgridDriver {
 			int jobletid = 0;
 			String message = null;
 			if (execute) {
+				JobletResult result = gridClient.execute(joblet);
+				message = String.format("Return code: %1$d, status: %2$d", result.getReturnCode(), result.getStatus());
+				System.out.println(result.getDetails());
+				returnCode = result.getReturnCode();
+			}
+			if (gridExecute) {
 				JobletResult result = gridClient.gridExecute(joblet, 1);
-				message = String.format("", result.getReturnCode(), result.getStatus());
+				message = String.format("Return code: %1$d, status: %2$d", result.getReturnCode(), result.getStatus());
+				System.out.println(result.getReturnCode());
 				returnCode = result.getReturnCode();
 			}
 			else if ((host == null) || (host.length() == 0)) {
