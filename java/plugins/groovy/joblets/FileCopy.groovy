@@ -27,9 +27,9 @@ class FileCopy implements SimpleJoblet {
 		boolean overwrite = Boolean.parseBoolean(params.get("overwrite"));
 
 		if (dest.exists()) {
-			assert overwrite, "Cannot overwrite ${filename}. Set overwrite to true.";
+			assert overwrite, "Cannot overwrite ${destFilename}. Set overwrite to true.";
 		}
-		assert dest.canWrite(), "Cannot write to ${filename}";
+		assert dest.canWrite(), "Cannot write to ${destFilename}";
 		OutputStreamUtils.copyFile(source, dest);
 		return new SimpleJobletResult(0, JOB_STATUS.COMPLETED, "");
 	}
