@@ -43,5 +43,7 @@
 	<classpathentry kind="lib" path="lib/bcprov-jdk16-140.jar"/>
 	<classpathentry kind="lib" path="lib/typica-1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/java_memcached-release_2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/geronimo-jms_1.1_spec-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/activation-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -22,6 +22,34 @@ import com.dgrid.test.resources.SimpleJavaJob2;
 
 public class DGridWorkerTestCase extends BaseTestCase {
 
+	public void testSettings() throws Exception {
+		String setting = "test.setting";
+		String defaultValue = "default.value";
+		String s1 = gridClient.getSetting(setting, defaultValue);
+		assertEquals(s1, defaultValue);
+		String hs1 = gridClient.getHostSetting(super.host.getId(), setting, defaultValue);
+		assertEquals(hs1, defaultValue);
+	}
+
+	public void testJavaJoblet() throws Exception {
+		String msg = "Hello, world";
+		Map<String, String> params = new HashMap<String, String>(1);
+		params.put(JavaJobletTypeHandler.CLASS_NAME_PARAM, SimpleJavaJob.class
+				.getName());
+		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
+				Constants.JAVA_JOBLET, "Joblet 2", params, msg,
+				JOB_STATUS.RECEIVED);
+		int jobletId = gridClient.submitJoblet(joblet, 0);
+
+		// work it
+		Thread.sleep(1);
+		super.doWork();
+
+		// get it back
+		JobletResult result = gridClient.getJobletResult(jobletId);
+		assertEquals(result.getDetails(), msg);
+	}
+
 	public void testJob() throws Exception {
 		String msg1 = "hello world";
 		String msg2 = "goodbye world";
@@ -67,26 +95,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Job result = gridClient.getJob(jobId);
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
 	}
-
-	public void testJavaJoblet() throws Exception {
-		String msg = "Hello, world";
-		Map<String, String> params = new HashMap<String, String>(1);
-		params.put(JavaJobletTypeHandler.CLASS_NAME_PARAM, SimpleJavaJob.class
-				.getName());
-		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
-				Constants.JAVA_JOBLET, "Joblet 2", params, msg,
-				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
-
-		// work it
-		Thread.sleep(1);
-		super.doWork();
-
-		// get it back
-		JobletResult result = gridClient.getJobletResult(jobletId);
-		assertEquals(result.getDetails(), msg);
-	}
-
+/*
 	public void testJavaJoblet2() throws Exception {
 		Map<String, String> params = new HashMap<String, String>(3);
 		params.put(JavaAppJobletTypeHandler.CLASS_NAME_PARAM,
@@ -211,6 +220,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		super.doWork();
 
 		// get it back
+		System.err.println("Got joblet id: " + jobletId);
 		JobletResult result = gridClient.getJobletResult(jobletId);
 		assertEquals(result.getJoblet().getStatus(), JOB_STATUS.COMPLETED);
 		assertEquals(result.getDetails(), msg);
@@ -269,5 +279,5 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		JobletResult result = gridClient.getJobletResult(jobletId);
 		assertEquals(result.getDetails(), Integer.toString(0));
 	}
-
+*/
 }

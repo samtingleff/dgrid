@@ -20,6 +20,7 @@ import com.dgrid.errors.AWSException;
 import com.dgrid.errors.TransportException;
 import com.dgrid.gen.InvalidApiKey;
 import com.dgrid.helpers.AWSConstants;
+import com.dgrid.helpers.MimeTypeHelper;
 import com.dgrid.helpers.S3Helper;
 import com.dgrid.service.DGridClient;
 
@@ -31,8 +32,14 @@ public class S3HelperImpl implements S3Helper {
 
 	private DGridClient gridClient;
 
+	private MimeTypeHelper mimeTypes;
+
 	public void setGridClient(DGridClient gridClient) {
 		this.gridClient = gridClient;
+	}
+
+	public void setMimeTypeHelper(MimeTypeHelper mimeTypes) {
+		this.mimeTypes = mimeTypes;
 	}
 
 	public String[] listBuckets() throws TransportException, IOException,
@@ -161,14 +168,13 @@ public class S3HelperImpl implements S3Helper {
 		this.get(bucket, key, new File(filename));
 	}
 
-	public String put(File file, String bucket, String key, String contentType,
-			boolean isPublic) throws IOException, AWSException,
-			TransportException {
+	public String put(File file, String bucket, String key, boolean isPublic)
+			throws IOException, AWSException, TransportException {
 		log.trace("put()");
-		return this.put(file, bucket, key, contentType, null, isPublic);
+		return this.put(file, bucket, key, null, isPublic);
 	}
 
-	public String put(File file, String bucket, String key, String contentType,
+	public String put(File file, String bucket, String key,
 			Map<String, Object> metadata, boolean isPublic) throws IOException,
 			AWSException, TransportException {
 		log.trace("put()");
@@ -179,7 +185,7 @@ public class S3HelperImpl implements S3Helper {
 				fileObject.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
 			else
 				fileObject.setAcl(AccessControlList.REST_CANNED_PRIVATE);
-			fileObject.setContentType(contentType);
+			fileObject.setContentType(mimeTypes.getContentType(file));
 			fileObject.setDataInputFile(file);
 			fileObject.setContentLength(file.length());
 			if (metadata != null)
@@ -197,11 +203,10 @@ public class S3HelperImpl implements S3Helper {
 	}
 
 	public String put(String filename, String bucket, String key,
-			String contentType, boolean isPublic) throws IOException,
-			AWSException, TransportException {
+			boolean isPublic) throws IOException, AWSException,
+			TransportException {
 		log.trace("put()");
-		return this.put(new File(filename), bucket, key, contentType, null,
-				isPublic);
+		return this.put(new File(filename), bucket, key, null, isPublic);
 	}
 
 	public void delete(String bucket, String key) throws TransportException,

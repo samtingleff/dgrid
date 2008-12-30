@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.danga.MemCached.MemCachedClient;
 
-public interface MemcacheHelper {
-	public static final String NAME = "memcacheHelper";
+public interface MemcachedHelper {
+	public static final String NAME = "memcachedHelper";
 
 	public boolean add(String key, Object value);
 

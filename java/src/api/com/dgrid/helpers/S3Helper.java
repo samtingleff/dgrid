@@ -29,17 +29,16 @@ public interface S3Helper {
 	public String[] listKeys(String bucket, String prefix, String delimiter)
 			throws TransportException, IOException, AWSException;
 
-	public String put(File file, String bucket, String key, String contentType,
-			boolean isPublic) throws TransportException, IOException,
-			AWSException;
+	public String put(File file, String bucket, String key, boolean isPublic)
+			throws TransportException, IOException, AWSException;
 
-	public String put(File file, String bucket, String key, String contentType,
+	public String put(File file, String bucket, String key,
 			Map<String, Object> metadata, boolean isPublic) throws IOException,
 			AWSException, TransportException;
 
 	public String put(String filename, String bucket, String key,
-			String contentType, boolean isPublic) throws TransportException,
-			IOException, AWSException;
+			boolean isPublic) throws TransportException, IOException,
+			AWSException;
 
 	public void get(String bucket, String key, File dest)
 			throws TransportException, IOException, AWSException;

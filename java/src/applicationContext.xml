@@ -42,6 +42,14 @@
         </property>
     </bean>
 
+    <!-- mime types helper -->
+    <bean
+            id="mimeTypeHelper"
+            class="com.dgrid.helpers.impl.MimeTypeHelper"
+            lazy-init="true"
+            init-method="init">
+    </bean>
+
     <bean
             id="mailSender"
             class="com.dgrid.helpers.impl.MailSenderImpl"
@@ -49,14 +57,15 @@
         <property name="gridClient" ref="gridClient"/>
     </bean>
 
-    <!-- memcache client helper -->
+    <!-- memcached client helper -->
     <bean
-            id="memcacheHelper"
-            class="com.dgrid.helpers.impl.MemcacheHelperImpl"
+            id="memcachedHelper"
+            class="com.dgrid.helpers.impl.MemcachedHelperImpl"
             scope="singleton"
             init-method="init"
             lazy-init="true">
-        <property name="gridClient" ref="gridClient"/>
+        <property name="servers" value="${memcached.servers}"/>
+        <property name="compatibility" value="${memcached.compatibility}"/>
     </bean>
 
     <!-- http client helper -->
@@ -77,6 +86,7 @@
             class="com.dgrid.helpers.impl.S3HelperImpl"
             lazy-init="true">
         <property name="gridClient" ref="gridClient"/>
+        <property name="mimeTypeHelper" ref="mimeTypeHelper"/>
     </bean>
 
     <!-- Amazon SQS client helper -->
@@ -154,6 +164,15 @@
         <property name="syncJobService" ref="syncJobService"/>
         <property name="transport" ref="${transport.type}"/>
         <property name="apiKey" value="${transport.apiKey}"/>
+    </bean>
+
+    <!-- (incomplete) memcached transport -->
+    <bean
+            id="memcached"
+            class="com.dgrid.transport.DGridMemcachedTransport"
+            scope="singleton"
+            lazy-init="true">
+        <property name="memcachedHelper" ref="memcachedHelper"/>
     </bean>
 
     <!-- thrift-based transport -->
