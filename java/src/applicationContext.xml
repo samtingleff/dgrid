@@ -45,7 +45,7 @@
     <!-- mime types helper -->
     <bean
             id="mimeTypeHelper"
-            class="com.dgrid.helpers.impl.MimeTypeHelper"
+            class="com.dgrid.helpers.impl.MimeTypeHelperImpl"
             lazy-init="true"
             init-method="init">
     </bean>
