@@ -19,6 +19,7 @@ Class-Path: ./lib/activation-1.1.1.jar
   ./lib/log4j-1.2.15.jar
   ./lib/mysql-connector-java-5.0.5-bin.jar
   ./lib/rome-1.0RC1.jar
+  ./lib/simple-jndi-0.11.4.jar
   ./lib/smack-3.0.4.jar
   ./lib/smackx-3.0.4.jar
   ./lib/spring-2.5.4.jar
