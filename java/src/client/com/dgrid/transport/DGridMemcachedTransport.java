@@ -9,8 +9,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import sun.reflect.misc.MethodUtil;
-
 import com.dgrid.errors.TransportException;
 import com.dgrid.gen.Host;
 import com.dgrid.gen.InvalidApiKey;
