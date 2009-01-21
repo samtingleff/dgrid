@@ -14,8 +14,12 @@
         <level value="WARN"/>
     </logger>
 
+    <logger name="org.springframework">
+        <level value="WARN"/>
+    </logger>
+
     <logger name="com.dgrid">
-        <level value="DEBUG"/>
+        <level value="WARN"/>
     </logger>
 
     <root>
