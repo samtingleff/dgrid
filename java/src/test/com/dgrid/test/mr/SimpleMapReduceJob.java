@@ -44,7 +44,8 @@ public class SimpleMapReduceJob implements MapReduceJob {
 		return joblets;
 	}
 
-	public SimpleJobletResult reduce(List<JobletResult> results) {
+	public SimpleJobletResult reduce(List<JobletResult> results,
+			Map<String, String> parameters, DGridClient gridClient) {
 		int retval = 0;
 		for (JobletResult jr : results) {
 			int v = Integer.parseInt(jr.getDetails());
