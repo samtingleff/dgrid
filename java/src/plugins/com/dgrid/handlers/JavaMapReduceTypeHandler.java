@@ -85,7 +85,8 @@ public class JavaMapReduceTypeHandler extends BaseJobletTypeHandler implements
 				results.add(jr);
 			}
 		}
-		SimpleJobletResult result = mrj.reduce(results);
+		SimpleJobletResult result = mrj.reduce(results, joblet.getParameters(),
+				gridClient);
 		return result;
 	}
 

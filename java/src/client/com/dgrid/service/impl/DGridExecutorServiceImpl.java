@@ -2,6 +2,7 @@ package com.dgrid.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -21,6 +22,8 @@ public class DGridExecutorServiceImpl extends ScheduledThreadPoolExecutor
 
 	private int maxThreadCount = 1;
 
+	private int activeTaskCounter = 0;
+
 	public DGridExecutorServiceImpl(int maxCpuCores, int threadsPerCore) {
 		super(
 				((Runtime.getRuntime().availableProcessors() < maxCpuCores) ? Runtime
@@ -36,6 +39,7 @@ public class DGridExecutorServiceImpl extends ScheduledThreadPoolExecutor
 	public void beforeExecute(Thread t, Runnable r) {
 		log.trace("beforeExecute()");
 		super.beforeExecute(t, r);
+		++activeTaskCounter;
 		int activeThreadCount = getActiveCount();
 		for (DGridTaskListener listener : listeners) {
 			try {
@@ -49,6 +53,7 @@ public class DGridExecutorServiceImpl extends ScheduledThreadPoolExecutor
 	public void afterExecute(Runnable r, Throwable t) {
 		log.trace("afterExecute()");
 		super.afterExecute(r, t);
+		--activeTaskCounter;
 		int activeThreadCount = getActiveCount();
 		for (DGridTaskListener listener : listeners) {
 			try {
@@ -72,7 +77,6 @@ public class DGridExecutorServiceImpl extends ScheduledThreadPoolExecutor
 
 	public int getActiveCount() {
 		log.trace("getActiveCount()");
-		return super.getActiveCount();
+		return Math.max(activeTaskCounter, super.getActiveCount());
 	}
-
 }

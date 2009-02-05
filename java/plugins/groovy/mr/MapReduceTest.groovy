@@ -26,7 +26,8 @@ class MapReduceTest implements MapReduceJob {
 		return joblets;
 	}
 
-	public SimpleJobletResult reduce(List<JobletResult> results) {
+	public SimpleJobletResult reduce(List<JobletResult> results, Map<String, String> parameters,
+			DGridClient gridClient) {
 		int retval = 0;
 		results.each { jr ->
 			int value = Integer.parseInt(jr.details.trim());
