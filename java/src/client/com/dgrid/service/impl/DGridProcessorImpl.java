@@ -31,6 +31,8 @@ public class DGridProcessorImpl implements Runnable, DGridProcessor,
 
 	private int threadsPerCore = 1;
 
+	private int maxCpuCores = 0;
+
 	private int threadCount = 1;
 
 	private long sleepTime = 30000;
@@ -57,11 +59,14 @@ public class DGridProcessorImpl implements Runnable, DGridProcessor,
 		this.threadsPerCore = threadsPerCore;
 	}
 
+	public void setMaxCpuCores(int maxCpuCores) {
+		this.maxCpuCores = maxCpuCores;
+	}
+
 	public void init() throws Exception {
 		log.trace("init()");
 
-		this.threadCount = Runtime.getRuntime().availableProcessors()
-				* threadsPerCore;
+		this.threadCount = getThreadCount();
 
 		// call this before initializing plugins
 		// want to guarantee that getHost() returns a valid host
@@ -170,6 +175,14 @@ public class DGridProcessorImpl implements Runnable, DGridProcessor,
 	public DGridClient getGridClient() {
 		log.trace("getGridClient()");
 		return client;
+	}
+
+	private int getThreadCount() {
+		if (maxCpuCores > 0) {
+			return maxCpuCores * threadsPerCore;
+		} else {
+			return Runtime.getRuntime().availableProcessors() * threadsPerCore;
+		}
 	}
 
 	private void sleep() {
