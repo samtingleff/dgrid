@@ -50,6 +50,15 @@
             init-method="init">
     </bean>
 
+    <!-- jdbc data mover -->
+    <!--
+    <bean
+            id="jdbcTransferHelper"
+            class="com.dgrid.helpers.impl.JdbcTransferHelperImpl"
+            lazy-init="true">
+    </bean>
+    -->
+
     <bean
             id="mailSender"
             class="com.dgrid.helpers.impl.MailSenderImpl"
@@ -96,6 +105,16 @@
             lazy-init="true">
         <property name="gridClient" ref="gridClient"/>
     </bean>
+
+    <!-- Amazon SDB client helper -->
+    <!--
+    <bean
+            id="sdbHelper"
+            class="com.dgrid.helpers.impl.SDBHelperImpl"
+            lazy-init="true">
+        <property name="gridClient" ref="gridClient"/>
+    </bean>
+    -->
 
     <!-- Amazon EC2 client helper -->
     <bean
@@ -261,6 +280,7 @@
         <property name="gridClient" ref="gridClient"/>
         <property name="threadPool" ref="threadPool"/>
         <property name="threadsPerCore" value="${threadPool.threadsPerCore}"/>
+        <property name="maxCpuCores" value="${threadPool.maxCpuCores}"/>
         <property name="sleepTime" value="${processor.sleepTime}"/>
     </bean>
 
