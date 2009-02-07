@@ -16,6 +16,7 @@ public class Worker extends BaseDgridDriver {
 
 	public static void main(String[] args) throws Exception {
 		log.trace("main()");
+		writePidFile();
 		AbstractApplicationContext ctx = getContext();
 		DGridProcessor driver = (DGridProcessor) ctx
 				.getBean(DGridProcessor.NAME);
@@ -54,6 +55,15 @@ public class Worker extends BaseDgridDriver {
 				}
 			};
 			t.start();
+		}
+	}
+
+	private static void writePidFile() {
+		try {
+			PidFileWriter pid = new PidFileWriter();
+			pid.writePidFile();
+		} catch (Exception e) {
+			log.warn("Unable to write pid:", e);
 		}
 	}
 }
