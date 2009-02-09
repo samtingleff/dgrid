@@ -12,7 +12,7 @@ public class PidFileWriter {
 	 * Return the process id of this process. Seems to work on Linux and OS X...
 	 * if you're on some weird OS like BeOS or Windows this may or may not work.
 	 * 
-	 * @return
+	 * @return pid The numeric process id of the running java process.
 	 */
 	public int getPid() {
 		String name = ManagementFactory.getRuntimeMXBean().getName();
