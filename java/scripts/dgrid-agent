@@ -4,7 +4,8 @@
 NICE=10
 JAVA_HOME=/usr/local/java
 DGRID_APP_ROOT=`pwd`
-JAVA_OPTS="-Djava.awt.headless=true -Xms20m -Xmx128m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:NewSize=10m -XX:MaxNewSize=10m -XX:SurvivorRatio=6 -XX:TargetSurvivorRatio=80"
+DGRID_PID=$DGRID_APP_ROOT/dgrid.pid
+JAVA_OPTS="-Dpid.file=$DGRID_PID -Djava.awt.headless=true -Xms20m -Xmx128m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:NewSize=10m -XX:MaxNewSize=10m -XX:SurvivorRatio=6 -XX:TargetSurvivorRatio=80"
 
 # Read configuration variable file if it is present
 # See scripts/etc-default-dgrid-agent for sample

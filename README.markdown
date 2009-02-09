@@ -22,7 +22,6 @@ Here's the implementation:
 		// this joblet requires four parameters and has two optional parameters
 		String bucket = params.get("bucket");
 		String key = params.get("key");
-		String contentType = params.get("contentType");
 		String filename = params.get("file");
 
 		// these are optional and assumed false by Boolean.parseBoolean() behavior
@@ -34,12 +33,11 @@ Here's the implementation:
 		// validate required params
 		assert bucket != null, "Bucket may not be null";
 		assert key != null, "Key may not be null";
-		assert contentType != null, "ContentType may not be null";
 		assert file.canRead(), "Cannot read file ${filename}";
 
 		// use the S3Helper class to do actual work
 		S3Helper s3 = (S3Helper) gridClient.getBean(S3Helper.NAME);
-		String url = s3.put(file, bucket, key, contentType, isPublic);
+		String url = s3.put(file, bucket, key, isPublic);
 		if (deleteAfterPut) {
 			file.delete();
 		}
@@ -50,5 +48,5 @@ Here's the implementation:
 
 We can insert this joblet into the system using dshell.jar:
 
-  java -jar dshell.jar --type groovy --param script:S3PutJoblet.groovy --param bucket:mybucket --param key:motd.txt --param contentType:text/plain --param file:/etc/motd --param public:true
+  java -jar dshell.jar --type groovy --param script:S3PutJoblet.groovy --param bucket:mybucket --param key:motd.txt --param file:/etc/motd --param public:true
 
