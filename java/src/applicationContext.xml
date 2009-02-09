@@ -107,14 +107,12 @@
     </bean>
 
     <!-- Amazon SDB client helper -->
-    <!--
     <bean
             id="sdbHelper"
             class="com.dgrid.helpers.impl.SDBHelperImpl"
             lazy-init="true">
         <property name="gridClient" ref="gridClient"/>
     </bean>
-    -->
 
     <!-- Amazon EC2 client helper -->
     <bean

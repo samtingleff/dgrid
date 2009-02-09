@@ -27,23 +27,24 @@
 	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
 	<classpathentry exported="true" kind="lib" path="lib/jdom-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/groovy-all-1.5.6.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.5-bin.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/antlr-2.7.6.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/hibernate3.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/javassist-3.4.GA.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/jta-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/slf4j-api-1.4.2.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/commons-dbcp-1.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/commons-pool-1.4.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/slf4j-log4j12-1.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.3.0-sp1/aspectjweaver-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/bcprov-jdk16-140.jar"/>
-	<classpathentry kind="lib" path="lib/typica-1.4.1.jar"/>
-	<classpathentry kind="lib" path="lib/java_memcached-release_2.0.1.jar"/>
-	<classpathentry kind="lib" path="lib/geronimo-jms_1.1_spec-1.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/activation-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.0.5-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/antlr-2.7.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/hibernate3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/javassist-3.4.GA.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/jta-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/slf4j-api-1.4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/commons-dbcp-1.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/commons-pool-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/slf4j-log4j12-1.5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.3.0-sp1/aspectjweaver-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bcprov-jdk16-140.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/typica-1.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/java_memcached-release_2.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geronimo-jms_1.1_spec-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/activation-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/simple-jndi-0.11.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
