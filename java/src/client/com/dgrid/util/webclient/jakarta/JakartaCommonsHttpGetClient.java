@@ -80,6 +80,23 @@ public class JakartaCommonsHttpGetClient implements HttpGetClient {
 		return (response);
 	}
 
+	public HttpResponse getPage(String url, Map<String, String> params)
+			throws IOException {
+		log.trace("getPage()");
+		GetMethod method = new GetMethod(url);
+		if (params != null) {
+			NameValuePair[] nvp = new NameValuePair[params.size()];
+			int i = 0;
+			for (Map.Entry<String, String> e : params.entrySet()) {
+				nvp[i] = new NameValuePair(e.getKey(), e.getValue());
+				++i;
+			}
+			method.setQueryString(nvp);
+		}
+		HttpResponse response = executeMethod(method);
+		return (response);
+	}
+
 	public HttpResponse postPage(String url, Map<String, String> params)
 			throws IOException {
 		log.trace("postPage()");

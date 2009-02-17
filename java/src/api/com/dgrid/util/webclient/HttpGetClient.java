@@ -17,6 +17,9 @@ public interface HttpGetClient {
 
 	public HttpResponse getPage(String url) throws IOException;
 
+	public HttpResponse getPage(String url, Map<String, String> params)
+			throws IOException;
+
 	public HttpResponse postPage(String url, Map<String, String> params)
 			throws IOException;
 
