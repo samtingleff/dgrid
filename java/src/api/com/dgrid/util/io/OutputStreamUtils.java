@@ -33,6 +33,7 @@ public class OutputStreamUtils {
 		while ((read = in.read(buffer)) > 0) {
 			out.write(buffer, 0, read);
 		}
+		out.flush();
 	}
 
 	public static void writeStreamToFile(InputStream in, File dest)
