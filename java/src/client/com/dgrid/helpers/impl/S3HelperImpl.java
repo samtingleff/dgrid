@@ -1,5 +1,6 @@
 package com.dgrid.helpers.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -207,6 +208,31 @@ public class S3HelperImpl implements S3Helper {
 			TransportException {
 		log.trace("put()");
 		return this.put(new File(filename), bucket, key, null, isPublic);
+	}
+
+	public String putString(String content, String bucket, String key,
+			String contentType, boolean isPublic) throws TransportException,
+			IOException, AWSException {
+		log.trace("putString()");
+		try {
+			S3Bucket s3bucket = new S3Bucket(bucket);
+			S3Object s3object = new S3Object(s3bucket, key);
+			if (isPublic)
+				s3object.setAcl(AccessControlList.REST_CANNED_PUBLIC_READ);
+			else
+				s3object.setAcl(AccessControlList.REST_CANNED_PRIVATE);
+			s3object.setContentType(contentType);
+			s3object.setDataInputStream(new ByteArrayInputStream(content.getBytes()));
+			S3Service s3Service = getS3Service();
+			s3Service.putObject(bucket, s3object);
+			s3object.closeDataInputStream();
+			return getUrl(s3object);
+		} catch (InvalidApiKey e) {
+			throw new AWSException(e);
+		} catch (S3ServiceException e) {
+			throw new AWSException(e);
+		} finally {
+		}
 	}
 
 	public void delete(String bucket, String key) throws TransportException,

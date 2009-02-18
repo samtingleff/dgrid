@@ -40,6 +40,10 @@ public interface S3Helper {
 			boolean isPublic) throws TransportException, IOException,
 			AWSException;
 
+	public String putString(String content, String bucket, String key,
+			String contentType, boolean isPublic) throws TransportException,
+			IOException, AWSException;
+
 	public void get(String bucket, String key, File dest)
 			throws TransportException, IOException, AWSException;
 
