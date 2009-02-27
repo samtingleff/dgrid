@@ -133,7 +133,7 @@
 			</classpath>
 			<doctitle><![CDATA[<h1>dgrid agent</h1>]]></doctitle>
 			<bottom><![CDATA[<i>Copyright &#169; 2008 Sam Tingleff.</i>]]></bottom>
-			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<link href="http://java.sun.com/javase/6/docs/api/"/>
 			<link href="http://jets3t.s3.amazonaws.com/api/"/>
 			<link href="http://typica.s3.amazonaws.com/"/>
 		</javadoc>
