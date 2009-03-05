@@ -13,8 +13,14 @@ public interface HttpClientHelper {
 	public HttpResponse getPage(String url, Map<String, String> params)
 			throws IOException;
 
+	public HttpResponse getPage(String url, Map<String, String> params,
+			String username, String password) throws IOException;
+
 	public HttpResponse postPage(String url, Map<String, String> params)
 			throws IOException;
+
+	public HttpResponse postPage(String url, Map<String, String> params,
+			String username, String password) throws IOException;
 
 	public HttpResponse postPage(String url, byte[] input, String contentType)
 			throws IOException;

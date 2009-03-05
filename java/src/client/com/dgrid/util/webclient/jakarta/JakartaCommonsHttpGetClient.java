@@ -1,6 +1,7 @@
 package com.dgrid.util.webclient.jakarta;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -10,8 +11,11 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -97,6 +101,30 @@ public class JakartaCommonsHttpGetClient implements HttpGetClient {
 		return (response);
 	}
 
+	public HttpResponse getPage(String url, Map<String, String> params,
+			String username, String password) throws IOException {
+		log.trace("getPage()");
+		GetMethod method = new GetMethod(url);
+		if (params != null) {
+			NameValuePair[] nvp = new NameValuePair[params.size()];
+			int i = 0;
+			for (Map.Entry<String, String> e : params.entrySet()) {
+				nvp[i] = new NameValuePair(e.getKey(), e.getValue());
+				++i;
+			}
+			method.setQueryString(nvp);
+		}
+		URL javaNetUrl = new URL(url);
+		client.getParams().setAuthenticationPreemptive(true);
+		HttpState state = new HttpState();
+		state.setCredentials(new AuthScope(javaNetUrl.getHost(), javaNetUrl
+				.getPort()),
+				new UsernamePasswordCredentials(username, password));
+		method.setDoAuthentication(true);
+		HttpResponse response = executeMethod(method, null, state);
+		return (response);
+	}
+
 	public HttpResponse postPage(String url, Map<String, String> params)
 			throws IOException {
 		log.trace("postPage()");
@@ -112,6 +140,31 @@ public class JakartaCommonsHttpGetClient implements HttpGetClient {
 		PostMethod method = new PostMethod(url);
 		method.setRequestBody(data);
 		HttpResponse response = executeMethod(method);
+		return (response);
+	}
+
+	public HttpResponse postPage(String url, Map<String, String> params,
+			String username, String password) throws IOException {
+		log.trace("postPage()");
+		NameValuePair[] data = new NameValuePair[params.size()];
+		Set<Map.Entry<String, String>> entries = params.entrySet();
+		Iterator<Map.Entry<String, String>> iter = entries.iterator();
+		int i = 0;
+		while (iter.hasNext()) {
+			Map.Entry<String, String> e = iter.next();
+			data[i] = new NameValuePair(e.getKey(), e.getValue());
+			++i;
+		}
+		PostMethod method = new PostMethod(url);
+		method.setRequestBody(data);
+		URL javaNetUrl = new URL(url);
+		client.getParams().setAuthenticationPreemptive(true);
+		HttpState state = new HttpState();
+		state.setCredentials(new AuthScope(javaNetUrl.getHost(), javaNetUrl
+				.getPort()),
+				new UsernamePasswordCredentials(username, password));
+		method.setDoAuthentication(true);
+		HttpResponse response = executeMethod(method, null, state);
 		return (response);
 	}
 
@@ -161,9 +214,21 @@ public class JakartaCommonsHttpGetClient implements HttpGetClient {
 	private HttpResponse executeMethod(HttpMethod method) throws HttpException,
 			IOException {
 		log.trace("executeMethod()");
+		return executeMethod(method, null, null);
+	}
+
+	private HttpResponse executeMethod(HttpMethod method,
+			HostConfiguration hostConfiguration, HttpState state)
+			throws HttpException, IOException {
+		log.trace("executeMethod()");
 		method.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
 		log.info("fetching url: " + method.getURI());
-		int result = client.executeMethod(method);
+		int result = 0;
+		if ((hostConfiguration != null) || (state != null))
+			result = client.executeMethod(hostConfiguration, method, state);
+		else
+			result = client.executeMethod(method);
+
 		Header contentTypeHeader = method.getResponseHeader("Content-Type");
 		String contentType = contentTypeHeader.getValue();
 		if (log.isDebugEnabled()) {

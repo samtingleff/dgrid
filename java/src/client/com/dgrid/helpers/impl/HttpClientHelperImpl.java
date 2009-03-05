@@ -44,6 +44,12 @@ public class HttpClientHelperImpl implements HttpClientHelper {
 		return response;
 	}
 
+	public HttpResponse getPage(String url, Map<String, String> params,
+			String username, String password) throws IOException {
+		HttpResponse response = client.getPage(url, params, username, password);
+		return response;
+	}
+
 	public HttpResponse postPage(String url, byte[] input, String contentType)
 			throws IOException {
 		HttpResponse response = client.postPage(url, input, contentType);
@@ -53,6 +59,13 @@ public class HttpClientHelperImpl implements HttpClientHelper {
 	public HttpResponse postPage(String url, Map<String, String> params)
 			throws IOException {
 		HttpResponse response = client.postPage(url, params);
+		return response;
+	}
+
+	public HttpResponse postPage(String url, Map<String, String> params,
+			String username, String password) throws IOException {
+		HttpResponse response = client
+				.postPage(url, params, username, password);
 		return response;
 	}
 
