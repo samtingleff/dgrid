@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -15,6 +17,8 @@ import com.dgrid.util.io.FileListener;
 
 public class JavaPluginsPlugin extends AbstractDynamicPlugin implements Plugin,
 		FileListener {
+	private static ClassLoader pluginClassLoader;
+
 	public JavaPluginsPlugin() {
 		super(new File("plugins/java"), 3000);
 	}
@@ -62,15 +66,30 @@ public class JavaPluginsPlugin extends AbstractDynamicPlugin implements Plugin,
 	}
 
 	private ClassLoader getClassLoader(File jar) throws MalformedURLException {
-		File extLibDir = new File("lib/ext");
-		File[] extJars = extLibDir.listFiles(new JarFileFilter());
-		URL[] urls = new URL[extJars.length + 1];
-		urls[0] = jar.toURI().toURL();
-		for (int i = 1; i <= extJars.length; ++i) {
-			urls[i] = extJars[i - 1].toURI().toURL();
+		if (pluginClassLoader == null) {
+			URL[] urls = getClassLoaderUrls();
+			pluginClassLoader = new URLClassLoader(urls, Thread.currentThread()
+					.getContextClassLoader());
 		}
-		URLClassLoader cl = new URLClassLoader(urls, Thread.currentThread()
-				.getContextClassLoader());
-		return cl;
+		return pluginClassLoader;
+	}
+
+	private URL[] getClassLoaderUrls() throws MalformedURLException {
+		List<File> jars = new LinkedList<File>();
+		FileFilter filter = new JarFileFilter();
+		File[] pluginJars = super.dir.listFiles(filter);
+		File[] extJars = new File("lib/ext").listFiles(filter);
+		URL[] urls = new URL[pluginJars.length + extJars.length];
+		int i = 0;
+		for (File file : pluginJars) {
+			urls[i] = file.toURI().toURL();
+			++i;
+		}
+		for (File file : extJars) {
+			urls[i] = file.toURI().toURL();
+			++i;
+		}
+		return urls;
+
 	}
 }
