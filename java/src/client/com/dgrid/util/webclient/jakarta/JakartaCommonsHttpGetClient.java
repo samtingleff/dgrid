@@ -5,12 +5,14 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
@@ -33,6 +35,9 @@ import com.dgrid.util.webclient.HttpGetClient;
 import com.dgrid.util.webclient.HttpResponse;
 
 public class JakartaCommonsHttpGetClient implements HttpGetClient {
+	private static final Pattern contentTypeHeaderPattern = Pattern
+			.compile("([a-zA-Z0-9\\-\\+\\.\\/]+)\\s*(.*)?");
+
 	private Log log = LogFactory.getLog(getClass());
 
 	private HostConfiguration hostConfiguration = new HostConfiguration();
@@ -211,13 +216,13 @@ public class JakartaCommonsHttpGetClient implements HttpGetClient {
 		return (response);
 	}
 
-	private HttpResponse executeMethod(HttpMethod method) throws HttpException,
-			IOException {
+	private HttpResponse executeMethod(HttpMethodBase method)
+			throws HttpException, IOException {
 		log.trace("executeMethod()");
 		return executeMethod(method, null, null);
 	}
 
-	private HttpResponse executeMethod(HttpMethod method,
+	private HttpResponse executeMethod(HttpMethodBase method,
 			HostConfiguration hostConfiguration, HttpState state)
 			throws HttpException, IOException {
 		log.trace("executeMethod()");
@@ -230,14 +235,23 @@ public class JakartaCommonsHttpGetClient implements HttpGetClient {
 			result = client.executeMethod(method);
 
 		Header contentTypeHeader = method.getResponseHeader("Content-Type");
-		String contentType = contentTypeHeader.getValue();
+		String contentTypeHeaderValue = contentTypeHeader.getValue();
+		String contentType = "text/html";
+		Matcher m = contentTypeHeaderPattern.matcher(contentTypeHeaderValue);
+		if (m.matches()) {
+			contentType = m.group(1);
+		}
+		long length = method.getResponseContentLength();
+		String charset = method.getResponseCharSet();
 		if (log.isDebugEnabled()) {
-			log.debug("HTTP response: " + result);
-			log.debug("Content type: " + contentType);
-			log.debug("Query string: " + method.getQueryString());
+			log.debug("HTTP response:   " + result);
+			log.debug("Content type:    " + contentType);
+			log.debug("Content charset: " + charset);
+			log.debug("Content length:  " + length);
+			log.debug("Query string:    " + method.getQueryString());
 		}
 		HttpResponse response = new JakartaCommonsHttpResponse(method, result,
-				contentType);
+				contentType, charset, length);
 		return (response);
 	}
 

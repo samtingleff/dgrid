@@ -2,7 +2,6 @@ package com.dgrid.util.webclient.jakarta;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.URIException;
@@ -17,11 +16,17 @@ public class JakartaCommonsHttpResponse implements HttpResponse {
 
 	private String contentType;
 
+	private String contentCharset;
+
+	private long contentLength;
+
 	public JakartaCommonsHttpResponse(HttpMethod method, int responseCode,
-			String contentType) {
+			String contentType, String charset, long contentLength) {
 		this.method = method;
 		this.responseCode = responseCode;
 		this.contentType = contentType;
+		this.contentCharset = charset;
+		this.contentLength = contentLength;
 	}
 
 	public int getResponseCode() {
@@ -38,6 +43,14 @@ public class JakartaCommonsHttpResponse implements HttpResponse {
 
 	public String getContentType() {
 		return (contentType);
+	}
+
+	public String getContentCharset() {
+		return contentCharset;
+	}
+
+	public long getContentLength() {
+		return contentLength;
 	}
 
 	public String getResponseBodyAsString() throws IOException {

@@ -26,6 +26,8 @@ public interface HttpResponse {
 
 	public String getContentType();
 
+	public String getContentCharset();
+
 	public String getResponseBodyAsString() throws IOException;
 
 	public InputStream getResponseBodyAsStream() throws IOException;
