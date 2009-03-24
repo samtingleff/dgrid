@@ -395,7 +395,7 @@ public class DGridHibernateTransport implements DGridTransport {
 		joblet.setTimeCreated(System.currentTimeMillis());
 		joblet = (Joblet) dao.create(joblet);
 		dao.update(job);
-		return joblet.getId();
+		return (jobId == 0) ? job.getId() : joblet.getId();
 	}
 
 	private Joblet readJoblet(int id) throws InvalidJobletId {
