@@ -65,8 +65,15 @@ public class CallbackJobletTypeHandler extends BaseJobletTypeHandler implements
 		HttpClientHelper httpClient = (HttpClientHelper) gridClient
 				.getBean(HttpClientHelper.NAME);
 		url = String.format(url, jobId);
-		HttpResponse response = httpClient.getPage(url);
-		response.releaseConnection();
+		HttpResponse response = null;
+		try {
+			response = httpClient.getPage(url);
+		} finally {
+			try {
+				response.releaseConnection();
+			} catch (Exception e) {
+			}
+		}
 	}
 
 	private void emailCallback(String to, String subject, String body,
