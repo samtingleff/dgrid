@@ -152,7 +152,7 @@ public class DGridHibernateTransport implements DGridTransport {
 				params.put("callbackAddress", job.getCallbackAddress());
 				Joblet callback = new Joblet(0, System.currentTimeMillis(), 0,
 						0, job.getSubmitter(), 2, Constants.CALLBACK_JOBLET,
-						"Callback for job # ", params, null,
+						"Callback for job # ", params, job.getCallbackContent(),
 						JOB_STATUS.RECEIVED);
 				try {
 					self.submitJoblet(callback, 0, JOB_CALLBACK_TYPES.NONE,
