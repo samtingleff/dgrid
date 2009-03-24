@@ -1,6 +1,7 @@
 package com.dgrid.helpers.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import com.dgrid.helpers.AWSConstants;
 import com.dgrid.helpers.MimeTypeHelper;
 import com.dgrid.helpers.S3Helper;
 import com.dgrid.service.DGridClient;
+import com.dgrid.util.io.OutputStreamUtils;
 
 public class S3HelperImpl implements S3Helper {
 
@@ -169,6 +171,30 @@ public class S3HelperImpl implements S3Helper {
 		this.get(bucket, key, new File(filename));
 	}
 
+	public String getString(String bucket, String key)
+			throws TransportException, IOException, AWSException {
+		log.trace("getString()");
+		try {
+			S3Service s3Service = getS3Service();
+			S3Bucket s3bucket = new S3Bucket(bucket);
+			S3Object s3object = s3Service.getObject(s3bucket, key);
+			InputStream is = s3object.getDataInputStream();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			OutputStreamUtils.writeStreamToStream(is, baos);
+			baos.close();
+			is.close();
+			s3object.closeDataInputStream();
+			return new String(baos.toByteArray());
+		} catch (S3ServiceException e) {
+			throw new AWSException(e);
+		} catch (TransportException e) {
+			throw new AWSException(e);
+		} catch (InvalidApiKey e) {
+			throw new AWSException(e);
+		} finally {
+		}
+	}
+
 	public String put(File file, String bucket, String key, boolean isPublic)
 			throws IOException, AWSException, TransportException {
 		log.trace("put()");
@@ -222,7 +248,8 @@ public class S3HelperImpl implements S3Helper {
 			else
 				s3object.setAcl(AccessControlList.REST_CANNED_PRIVATE);
 			s3object.setContentType(contentType);
-			s3object.setDataInputStream(new ByteArrayInputStream(content.getBytes()));
+			s3object.setDataInputStream(new ByteArrayInputStream(content
+					.getBytes()));
 			S3Service s3Service = getS3Service();
 			s3Service.putObject(bucket, s3object);
 			s3object.closeDataInputStream();

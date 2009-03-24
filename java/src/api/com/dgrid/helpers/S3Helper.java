@@ -50,6 +50,9 @@ public interface S3Helper {
 	public void get(String bucket, String key, String filename)
 			throws TransportException, IOException, AWSException;
 
+	public String getString(String bucket, String key)
+			throws TransportException, IOException, AWSException;
+
 	public void delete(String bucket, String key) throws TransportException,
 			IOException, AWSException;
 
