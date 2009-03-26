@@ -27,7 +27,8 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		String defaultValue = "default.value";
 		String s1 = gridClient.getSetting(setting, defaultValue);
 		assertEquals(s1, defaultValue);
-		String hs1 = gridClient.getHostSetting(super.host.getId(), setting, defaultValue);
+		String hs1 = gridClient.getHostSetting(super.host.getId(), setting,
+				defaultValue);
 		assertEquals(hs1, defaultValue);
 	}
 
@@ -39,7 +40,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVA_JOBLET, "Joblet 2", params, msg,
 				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -71,7 +72,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 
 		Job job = new Job(0, 0l, getHostname(), "Test job", joblets,
 				JOB_CALLBACK_TYPES.NONE, "", "", JOB_STATUS.RECEIVED);
-		int jobId = gridClient.submitJob(job);
+		int jobId = gridClient.submitJob(job).getId();
 
 		// submit another joblet to same job
 		params = new HashMap<String, String>(1);
@@ -94,8 +95,9 @@ public class DGridWorkerTestCase extends BaseTestCase {
 
 		Job result = gridClient.getJob(jobId);
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
+		assertEquals(gridClient.getJobletQueueSize(), 0);
 	}
-/*
+
 	public void testJavaJoblet2() throws Exception {
 		Map<String, String> params = new HashMap<String, String>(3);
 		params.put(JavaAppJobletTypeHandler.CLASS_NAME_PARAM,
@@ -108,7 +110,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 				Constants.JAVA_APP_JOBLET, "Joblet 2", params, "",
 				JOB_STATUS.RECEIVED);
 
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -129,7 +131,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Joblet joblet1 = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.SYSTEM_JOBLET, "Simple echo joblet", params, command,
 				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet1, 0);
+		int jobletId = gridClient.submitJoblet(joblet1, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -146,7 +148,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Joblet joblet2 = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.SYSTEM_JOBLET, "Simple echo joblet", params, command,
 				JOB_STATUS.RECEIVED);
-		jobletId = gridClient.submitJoblet(joblet2, 0);
+		jobletId = gridClient.submitJoblet(joblet2, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -162,7 +164,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		params.put("class", SimpleJunit3TestCase.class.getName());
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1, "junit",
 				"Junit3 test case", params, "", JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -171,6 +173,10 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		// should have two new joblets in the queue
 		int queueSize = gridClient.getJobletQueueSize();
 		assertEquals(queueSize, 2);
+
+		List<Joblet> active = gridClient.listActiveJoblets(null, 0, 10);
+		assertNotNull(active);
+		assertEquals(active.size(), 2);
 
 		super.doWork();
 		super.doWork();
@@ -185,7 +191,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		params.put("class", SimpleJunit4TestCase.class.getName());
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1, "junit",
 				"Junit4 test case", params, "", JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -213,7 +219,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 				Constants.JAVA_JOBLET, "Joblet 2", params, msg,
 				JOB_STATUS.RECEIVED);
 		int jobletId = gridClient.submitHostJoblet(host.getHostname(), joblet,
-				0);
+				0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -239,7 +245,7 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Job job = new Job(0, 0l, getHostname(), "Callback test", joblets,
 				JOB_CALLBACK_TYPES.EMAIL, "sam@stevie.samnbree.net",
 				"Callback test contents", JOB_STATUS.RECEIVED);
-		int jobId = gridClient.submitJob(job);
+		int jobId = gridClient.submitJob(job).getId();
 
 		assertEquals(gridClient.getJobletQueueSize(), 1);
 
@@ -269,7 +275,8 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.AGENT_SHUTDOWN_JOBLET, "Shut down agent",
 				new HashMap<String, String>(0), "", JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitHostJoblet(getHostname(), joblet, 0);
+		int jobletId = gridClient.submitHostJoblet(getHostname(), joblet, 0)
+				.getId();
 
 		// work it
 		Thread.sleep(1);
@@ -279,5 +286,5 @@ public class DGridWorkerTestCase extends BaseTestCase {
 		JobletResult result = gridClient.getJobletResult(jobletId);
 		assertEquals(result.getDetails(), Integer.toString(0));
 	}
-*/
+
 }

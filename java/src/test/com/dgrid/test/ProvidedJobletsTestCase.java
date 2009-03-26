@@ -42,7 +42,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		params.put("delete", Boolean.toString(true));
 		Joblet joblet1 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
-		int jobletid1 = gridClient.submitJoblet(joblet1, 0);
+		int jobletid1 = gridClient.submitJoblet(joblet1, 0).getId();
 
 		// more content
 		params = new HashMap<String, String>();
@@ -55,7 +55,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		params.put("delete", Boolean.toString(false));
 		Joblet joblet2 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
-		int jobletid2 = gridClient.submitJoblet(joblet2, 0);
+		int jobletid2 = gridClient.submitJoblet(joblet2, 0).getId();
 
 		JobletResult result1 = super.doWork();
 		// work second s3 put
@@ -79,7 +79,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		params.put("file", file2.getAbsolutePath());
 		Joblet joblet3 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
-		int jobletid3 = gridClient.submitJoblet(joblet3, 0);
+		int jobletid3 = gridClient.submitJoblet(joblet3, 0).getId();
 		JobletResult result3 = super.doWork();
 		String content2 = InputStreamUtils.getFileAsString(file2);
 		assertEquals(content2, content);
@@ -91,7 +91,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		params.put("key", key1);
 		Joblet joblet4 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
-		int jobletid4 = gridClient.submitJoblet(joblet4, 0);
+		int jobletid4 = gridClient.submitJoblet(joblet4, 0).getId();
 		JobletResult result4 = super.doWork();
 		assertEquals(result4.getStatus(), JOB_STATUS.COMPLETED);
 		
@@ -103,7 +103,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		params.put("delimiter", null);
 		Joblet joblet5 = new Joblet(0, 0l, 0, 0, getHostname(), 1, "groovy",
 				"Some description", params, content, JOB_STATUS.RECEIVED);
-		int jobletid5 = gridClient.submitJoblet(joblet5, 0);
+		int jobletid5 = gridClient.submitJoblet(joblet5, 0).getId();
 		JobletResult result5 = super.doWork();
 		assertEquals(result4.getStatus(), JOB_STATUS.COMPLETED);
 	}
@@ -125,7 +125,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Some description", params, content,
 				JOB_STATUS.RECEIVED);
-		int jobletid = gridClient.submitJoblet(joblet, 0);
+		int jobletid = gridClient.submitJoblet(joblet, 0).getId();
 
 		JobletResult result = super.doWork();
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
@@ -154,7 +154,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Some description", params, "",
 				JOB_STATUS.RECEIVED);
-		int jobletid = gridClient.submitJoblet(joblet, 0);
+		int jobletid = gridClient.submitJoblet(joblet, 0).getId();
 		JobletResult result = super.doWork();
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
 	}
@@ -170,7 +170,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Some description", params, "",
 				JOB_STATUS.RECEIVED);
-		int jobletid = gridClient.submitJoblet(joblet, 0);
+		int jobletid = gridClient.submitJoblet(joblet, 0).getId();
 		JobletResult result = super.doWork();
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
 		String contents = InputStreamUtils.getFileAsString(dest);
@@ -188,7 +188,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Some description", params, urls,
 				JOB_STATUS.RECEIVED);
-		int jobletid = gridClient.submitJoblet(joblet, 0);
+		int jobletid = gridClient.submitJoblet(joblet, 0).getId();
 		JobletResult result = super.doWork();
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
 		long totalDuration = Long.parseLong(result.getDetails());
@@ -209,7 +209,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Some description", params, content,
 				JOB_STATUS.RECEIVED);
-		int jobletid = gridClient.submitJoblet(joblet, 0);
+		int jobletid = gridClient.submitJoblet(joblet, 0).getId();
 
 		JobletResult result = super.doWork();
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
@@ -223,7 +223,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Some description", params, "",
 				JOB_STATUS.RECEIVED);
-		int jobletid = gridClient.submitJoblet(joblet, 0);
+		int jobletid = gridClient.submitJoblet(joblet, 0).getId();
 
 		JobletResult result = super.doWork();
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);
@@ -243,7 +243,7 @@ public class ProvidedJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Some description", params, content,
 				JOB_STATUS.RECEIVED);
-		int jobletid = gridClient.submitJoblet(joblet, 0);
+		int jobletid = gridClient.submitJoblet(joblet, 0).getId();
 
 		JobletResult result = super.doWork();
 		assertEquals(result.getStatus(), JOB_STATUS.COMPLETED);

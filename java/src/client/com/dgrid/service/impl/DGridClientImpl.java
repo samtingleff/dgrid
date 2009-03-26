@@ -133,6 +133,10 @@ public class DGridClientImpl implements DGridClient, ApplicationContextAware {
 		return getHostByName(HostnameDiscovery.getHostname());
 	}
 
+	public Host getHost(int id) throws TransportException, InvalidApiKey, InvalidHost {
+		return transport.getHost(id);
+	}
+
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost {
 		return transport.getHostByName(hostname);
@@ -188,7 +192,7 @@ public class DGridClientImpl implements DGridClient, ApplicationContextAware {
 		transport.setHostFacts(hostid, facts);
 	}
 
-	public int submitHostJob(String hostname, Job job)
+	public Job submitHostJob(String hostname, Job job)
 			throws TransportException, InvalidHost, InvalidApiKey {
 		Host host = getHostByName(hostname);
 		for (Joblet j : job.getJoblets()) {
@@ -197,7 +201,7 @@ public class DGridClientImpl implements DGridClient, ApplicationContextAware {
 		return transport.submitJob(job);
 	}
 
-	public int submitHostJoblet(String hostname, Joblet joblet, int jobId,
+	public Joblet submitHostJoblet(String hostname, Joblet joblet, int jobId,
 			int callbackType, String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId, InvalidHost {
 		Host host = getHostByName(hostname);
@@ -206,24 +210,24 @@ public class DGridClientImpl implements DGridClient, ApplicationContextAware {
 				callbackAddress, callbackContent);
 	}
 
-	public int submitHostJoblet(String hostname, Joblet joblet, int jobId)
+	public Joblet submitHostJoblet(String hostname, Joblet joblet, int jobId)
 			throws TransportException, InvalidApiKey, InvalidJobId, InvalidHost {
 		return this.submitHostJoblet(hostname, joblet, jobId,
 				JOB_CALLBACK_TYPES.NONE, "", "");
 	}
 
-	public int submitJob(Job job) throws TransportException, InvalidApiKey {
+	public Job submitJob(Job job) throws TransportException, InvalidApiKey {
 		return transport.submitJob(job);
 	}
 
-	public int submitJoblet(Joblet joblet, int jobId, int callbackType,
+	public Joblet submitJoblet(Joblet joblet, int jobId, int callbackType,
 			String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId {
 		return transport.submitJoblet(joblet, jobId, callbackType,
 				callbackAddress, callbackContent);
 	}
 
-	public int submitJoblet(Joblet joblet, int jobId)
+	public Joblet submitJoblet(Joblet joblet, int jobId)
 			throws TransportException, InvalidApiKey, InvalidJobId {
 		return this
 				.submitJoblet(joblet, jobId, JOB_CALLBACK_TYPES.NONE, "", "");
@@ -231,5 +235,10 @@ public class DGridClientImpl implements DGridClient, ApplicationContextAware {
 
 	public int getJobletQueueSize() throws TransportException, InvalidApiKey {
 		return transport.getJobletQueueSize();
+	}
+
+	public List<Joblet> listActiveJoblets(String submitter, int offset,
+			int limit) throws TransportException, InvalidApiKey {
+		return transport.listActiveJoblets(submitter, offset, limit);
 	}
 }

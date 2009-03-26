@@ -71,6 +71,15 @@ public class DGridDummyTransport implements DGridTransport {
 		return h;
 	}
 
+	public Host getHost(int id) throws TransportException, InvalidApiKey,
+			InvalidHost {
+		for (Host h : hosts.values()) {
+			if (h.getId() == id)
+				return h;
+		}
+		throw new InvalidHost();
+	}
+
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost {
 		Host h = hosts.get(hostname);
@@ -151,6 +160,24 @@ public class DGridDummyTransport implements DGridTransport {
 		return workQueue.size();
 	}
 
+	public List<Joblet> listActiveJoblets(String submitter, int offset,
+			int limit) throws TransportException, InvalidApiKey {
+		log.trace("getJobletQueueSize()");
+		List<Joblet> results = new ArrayList<Joblet>();
+		for (Joblet joblet : workQueue) {
+			if (submitter != null) {
+				if (joblet.getSubmitter().equals(submitter))
+					results.add(joblet);
+			} else {
+				results.add(joblet);
+			}
+			// don't worry about offset
+			if (results.size() >= limit)
+				break;
+		}
+		return results;
+	}
+
 	public JobletResult getJobletResult(int jobletId)
 			throws TransportException, InvalidApiKey, InvalidJobletId {
 		JobletResult jr = results.get(jobletId);
@@ -191,19 +218,19 @@ public class DGridDummyTransport implements DGridTransport {
 		workQueue.add(j);
 	}
 
-	public int submitHostJob(String hostname, Job job)
+	public Job submitHostJob(String hostname, Job job)
 			throws TransportException, InvalidHost, InvalidApiKey {
 		return submitJob(job);
 	}
 
-	public int submitHostJoblet(String hostname, Joblet joblet, int jobId,
+	public Joblet submitHostJoblet(String hostname, Joblet joblet, int jobId,
 			int callbackType, String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId, InvalidHost {
 		return submitJoblet(joblet, jobId, callbackType, callbackAddress,
 				callbackContent);
 	}
 
-	public int submitJob(Job job) throws TransportException, InvalidApiKey {
+	public Job submitJob(Job job) throws TransportException, InvalidApiKey {
 		job.setId(random.nextInt());
 		jobs.put(job.getId(), job);
 		for (Joblet joblet : job.getJoblets()) {
@@ -211,10 +238,10 @@ public class DGridDummyTransport implements DGridTransport {
 			joblet.setJobId(job.getId());
 			workQueue.add(joblet);
 		}
-		return job.getId();
+		return job;
 	}
 
-	public int submitJoblet(Joblet joblet, int jobId, int callbackType,
+	public Joblet submitJoblet(Joblet joblet, int jobId, int callbackType,
 			String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId {
 		Job j = null;
@@ -231,7 +258,7 @@ public class DGridDummyTransport implements DGridTransport {
 		joblet.setId(random.nextInt());
 		j.getJoblets().add(joblet);
 		workQueue.add(joblet);
-		return joblet.getId();
+		return joblet;
 	}
 
 	private void executeCallback(Job job) throws TransportException,

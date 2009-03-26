@@ -24,8 +24,7 @@ import com.dgrid.gen.NoWorkAvailable;
 import com.dgrid.helpers.MemcachedHelper;
 import com.dgrid.service.DGridTransport;
 
-public class DGridMemcachedTransport implements DGridTransport
-{
+public class DGridMemcachedTransport implements DGridTransport {
 	private static final String HOSTS = "hosts";
 
 	private static final String HOST_REFERENCES = "hosts.references";
@@ -54,29 +53,25 @@ public class DGridMemcachedTransport implements DGridTransport
 
 	private MemcachedHelper mcc;
 
-	public void setMemcachedHelper(MemcachedHelper mcc)
-	{
+	public void setMemcachedHelper(MemcachedHelper mcc) {
 		this.mcc = mcc;
 	}
 
-	public void setApiKey(String apiKey)
-	{
+	public void setApiKey(String apiKey) {
 		log.trace("setApiKey()");
 	}
 
-	public void setEndpoint(String endpoint)
-	{
+	public void setEndpoint(String endpoint) {
 		log.trace("setEndpoint()");
 	}
 
-	public void setPort(int port)
-	{
+	public void setPort(int port) {
 		log.trace("setPort()");
 	}
 
-	public void completeJoblet(int jobletId, JobletResult result, String logMessage) throws TransportException,
-			InvalidApiKey, InvalidJobletId
-	{
+	public void completeJoblet(int jobletId, JobletResult result,
+			String logMessage) throws TransportException, InvalidApiKey,
+			InvalidJobletId {
 		log.trace("completeJoblet()");
 		Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS, jobletId));
 		if (joblet == null)
@@ -90,7 +85,7 @@ public class DGridMemcachedTransport implements DGridTransport
 		// update joblet status
 		joblet.setStatus(result.getStatus());
 		mcc.set(getKey(JOBLETS, jobletId), joblet);
-		
+
 		// get the job
 		Job job = (Job) mcc.get(getKey(JOBS, joblet.getJobId()));
 		if (job == null)
@@ -101,14 +96,16 @@ public class DGridMemcachedTransport implements DGridTransport
 		boolean isCompleted = true;
 		boolean success = false;
 
-		int[] jobletIds = (int[]) mcc.get(getKey(JOBLET_REFERENCES, joblet.getJobId()));
+		int[] jobletIds = (int[]) mcc.get(getKey(JOBLET_REFERENCES, joblet
+				.getJobId()));
 		List<Integer> savedJobs = new ArrayList<Integer>(0);
-		for (int i = 0; i < jobletIds.length; ++i)
-		{
+		for (int i = 0; i < jobletIds.length; ++i) {
 			Joblet j = (Joblet) mcc.get(getKey(JOBLETS, jobletIds[i]));
 			int status = j.getStatus();
-			// if status is received, queued or processing, we're still chugging along
-			if ((status >= JOB_STATUS.RECEIVED) && (status <= JOB_STATUS.PROCESSING)) {
+			// if status is received, queued or processing, we're still chugging
+			// along
+			if ((status >= JOB_STATUS.RECEIVED)
+					&& (status <= JOB_STATUS.PROCESSING)) {
 				isCompleted = false;
 				break;
 			} else if (status == JOB_STATUS.SAVED) {
@@ -126,7 +123,8 @@ public class DGridMemcachedTransport implements DGridTransport
 		} else if (isCompleted) {
 			// completed but have saved jobs to exec
 			for (Integer i : savedJobs) {
-				Joblet j = (Joblet) mcc.get(getKey(SAVED_JOBLETS, i.intValue()));
+				Joblet j = (Joblet) mcc
+						.get(getKey(SAVED_JOBLETS, i.intValue()));
 				int oldJobletId = j.getId();
 				j.setStatus(JOB_STATUS.RECEIVED);
 				j.setId(createId(JOBLETS));
@@ -139,62 +137,61 @@ public class DGridMemcachedTransport implements DGridTransport
 		// complete the job
 	}
 
-	public Host getHostByName(String hostname) throws TransportException, InvalidApiKey, InvalidHost
-	{
+	public Host getHost(int id) throws TransportException, InvalidApiKey,
+			InvalidHost {
+		log.trace("getHost()");
+		Host host = (Host) mcc.get(getKey(HOSTS, id));
+		if (host == null)
+			throw new InvalidHost();
+		else
+			return host;
+	}
+
+	public Host getHostByName(String hostname) throws TransportException,
+			InvalidApiKey, InvalidHost {
 		log.trace("getHostByName()");
 		String hostid = (String) mcc.get(getKey(HOST_REFERENCES, hostname));
-		if (hostid == null)
-		{
+		if (hostid == null) {
 			throw new InvalidHost();
-		}
-		else
-		{
+		} else {
 			Host host = (Host) mcc.get(getKey(HOSTS, Integer.parseInt(hostid)));
-			if (host == null)
-			{
+			if (host == null) {
 				throw new InvalidHost();
-			}
-			else
-			{
+			} else {
 				return host;
 			}
 		}
 	}
 
-	public String getHostSetting(int hostid, String name, String defaultValue) throws TransportException,
-			InvalidApiKey, InvalidHost
-	{
+	public String getHostSetting(int hostid, String name, String defaultValue)
+			throws TransportException, InvalidApiKey, InvalidHost {
 		log.trace("getHostSetting()");
-		String key = getKey(HOST_SETTINGS, String.format("%1$d.%2$s", hostid, name));
+		String key = getKey(HOST_SETTINGS, String.format("%1$d.%2$s", hostid,
+				name));
 		String value = (String) mcc.get(key);
-		if (value == null)
-		{
+		if (value == null) {
 			mcc.set(key, defaultValue);
 			value = defaultValue;
 		}
 		return value;
 	}
 
-	public Job getJob(int jobId) throws TransportException, InvalidApiKey, InvalidJobId
-	{
+	public Job getJob(int jobId) throws TransportException, InvalidApiKey,
+			InvalidJobId {
 		log.trace("getJob()");
 		Job job = (Job) mcc.get(getKey(JOBS, jobId));
 		if (job == null)
 			throw new InvalidJobId();
-		else
-		{
+		else {
 			// need to fill in joblets
 			int[] jobletIds = (int[]) mcc.get(getKey(JOBLET_REFERENCES, jobId));
-			if (jobletIds == null)
-			{
+			if (jobletIds == null) {
 				job.setJoblets(Collections.EMPTY_LIST);
-			}
-			else
-			{
+			} else {
 				List<Joblet> joblets = new ArrayList<Joblet>(jobletIds.length);
-				for (int i = 0; i < jobletIds.length; ++i)
-				{
-					Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS, jobletIds[i]));
+				for (int i = 0; i < jobletIds.length; ++i) {
+					Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS,
+							jobletIds[i]));
 					joblets.add(joblet);
 				}
 				job.setJoblets(joblets);
@@ -203,20 +200,25 @@ public class DGridMemcachedTransport implements DGridTransport
 		return job;
 	}
 
-	public int getJobletQueueSize() throws TransportException, InvalidApiKey
-	{
+	public int getJobletQueueSize() throws TransportException, InvalidApiKey {
 		log.trace("getJobletQueueSize()");
 		throw new NoSuchMethodError();
 	}
 
-	public JobletResult getJobletResult(int jobletId) throws TransportException, InvalidApiKey, InvalidJobletId
-	{
+	public List<Joblet> listActiveJoblets(String submitter, int offset,
+			int limit) throws TransportException, InvalidApiKey {
+		log.trace("getJobletQueueSize()");
+		throw new NoSuchMethodError();
+	}
+
+	public JobletResult getJobletResult(int jobletId)
+			throws TransportException, InvalidApiKey, InvalidJobletId {
 		log.trace("getJobletResult()");
-		JobletResult result = (JobletResult) mcc.get(getKey(JOBLET_RESULTS, jobletId));
+		JobletResult result = (JobletResult) mcc.get(getKey(JOBLET_RESULTS,
+				jobletId));
 		if (result == null)
 			throw new InvalidJobletId();
-		else
-		{
+		else {
 			// set joblet reference
 			Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS, jobletId));
 			result.setJoblet(joblet);
@@ -224,22 +226,22 @@ public class DGridMemcachedTransport implements DGridTransport
 		return result;
 	}
 
-	public List<JobletResult> getResults(int jobId) throws TransportException, InvalidApiKey, InvalidJobId
-	{
+	public List<JobletResult> getResults(int jobId) throws TransportException,
+			InvalidApiKey, InvalidJobId {
 		log.trace("getResults()");
 		int[] jobletIds = (int[]) mcc.get(getKey(JOBLET_REFERENCES, jobId));
 		if (jobletIds == null)
 			throw new InvalidJobId();
-		else
-		{
-			List<JobletResult> results = new ArrayList<JobletResult>(jobletIds.length);
-			for (int i = 0; i < jobletIds.length; ++i)
-			{
-				JobletResult jr = (JobletResult) mcc.get(getKey(JOBLET_RESULTS, jobletIds[i]));
-				if (jr != null)
-				{
+		else {
+			List<JobletResult> results = new ArrayList<JobletResult>(
+					jobletIds.length);
+			for (int i = 0; i < jobletIds.length; ++i) {
+				JobletResult jr = (JobletResult) mcc.get(getKey(JOBLET_RESULTS,
+						jobletIds[i]));
+				if (jr != null) {
 					// set joblet reference
-					Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS, jobletIds[i]));
+					Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS,
+							jobletIds[i]));
 					jr.setJoblet(joblet);
 					results.add(jr);
 				}
@@ -248,81 +250,68 @@ public class DGridMemcachedTransport implements DGridTransport
 		}
 	}
 
-	public String getSetting(String name, String defaultValue) throws TransportException, InvalidApiKey
-	{
+	public String getSetting(String name, String defaultValue)
+			throws TransportException, InvalidApiKey {
 		log.trace("getSetting()");
 		String key = getKey(SETTINGS, name);
 		String value = (String) mcc.get(key);
-		if (value == null)
-		{
+		if (value == null) {
 			mcc.set(key, defaultValue);
 			value = defaultValue;
 		}
 		return value;
 	}
 
-	public Joblet getWork() throws TransportException, InvalidApiKey, InvalidHost, NoWorkAvailable
-	{
+	public Joblet getWork() throws TransportException, InvalidApiKey,
+			InvalidHost, NoWorkAvailable {
 		log.trace("getWork()");
 		int counter = getId(JOBLET_QUEUE);
-		if (counter < 0)
-		{
+		if (counter < 0) {
 			throw new NoWorkAvailable();
-		}
-		else
-		{
+		} else {
 			// get the joblet at named counter
 			Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS, counter));
-			if (joblet != null)
-			{
+			if (joblet != null) {
 				// update joblet status
 				joblet.setStatus(JOB_STATUS.QUEUED);
 				mcc.set(getKey(JOBLETS, joblet.getId()), joblet);
 				// increment counter
 				int next = createId(JOBLET_QUEUE);
 				return joblet;
-			}
-			else
-			{
+			} else {
 				throw new NoWorkAvailable();
 			}
 		}
 	}
 
-	public JobletResult gridExecute(Joblet joblet, int retries) throws InvalidApiKey, TransportException,
-			NoHostAvailable
-	{
+	public JobletResult gridExecute(Joblet joblet, int retries)
+			throws InvalidApiKey, TransportException, NoHostAvailable {
 		log.trace("gridExecute()");
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void log(int jobletId, int jobletStatus, String message) throws TransportException, InvalidApiKey,
-			InvalidJobletId
-	{
+	public void log(int jobletId, int jobletStatus, String message)
+			throws TransportException, InvalidApiKey, InvalidJobletId {
 		log.trace("log()");
 		// TODO Auto-generated method stub
 	}
 
-	public Host registerHost(String hostname) throws TransportException, InvalidApiKey, InvalidHost
-	{
+	public Host registerHost(String hostname) throws TransportException,
+			InvalidApiKey, InvalidHost {
 		log.trace("registerHost()");
 		Host host = null;
 		String hostid = (String) mcc.get(getKey(HOST_REFERENCES, hostname));
-		if (hostid == null)
-		{
+		if (hostid == null) {
 			int id = createId(HOSTS);
 			host = new Host(id, hostname, new HashMap<String, String>());
 			mcc.set(getKey(HOSTS, id), host);
 			// register alias from hostname -> id
 			mcc.set(getKey(HOST_REFERENCES, hostname), id);
-		}
-		else
-		{
+		} else {
 			int id = Integer.parseInt(hostid);
 			host = (Host) mcc.get(getKey(HOSTS, id));
-			if (host == null)
-			{
+			if (host == null) {
 				// strange - have an id reference but no matching host
 				host = new Host(id, hostname, new HashMap<String, String>());
 				mcc.set(getKey(HOSTS, id), host);
@@ -331,38 +320,32 @@ public class DGridMemcachedTransport implements DGridTransport
 		return host;
 	}
 
-	public void releaseJoblet(int jobletId) throws InvalidApiKey, TransportException, InvalidJobletId
-	{
+	public void releaseJoblet(int jobletId) throws InvalidApiKey,
+			TransportException, InvalidJobletId {
 		log.trace("releaseJoblet()");
 		throw new NoSuchMethodError();
 	}
 
-	public void setHostFacts(int hostid, Map<String, String> facts) throws TransportException, InvalidApiKey,
-			InvalidHost
-	{
+	public void setHostFacts(int hostid, Map<String, String> facts)
+			throws TransportException, InvalidApiKey, InvalidHost {
 		log.trace("setHostFacts()");
 		Host host = (Host) mcc.get(getKey(HOSTS, hostid));
-		if (host == null)
-		{
+		if (host == null) {
 			throw new InvalidHost();
-		}
-		else
-		{
+		} else {
 			host.getFacts().putAll(facts);
 			mcc.set(getKey(HOSTS, hostid), host);
 		}
 	}
 
-	public int submitJob(Job job) throws TransportException, InvalidApiKey
-	{
+	public Job submitJob(Job job) throws TransportException, InvalidApiKey {
 		log.trace("submitJob()");
 		int jobId = createId(JOBS);
 		job.setId(jobId);
 		job.setTimeCreated(System.currentTimeMillis());
 		mcc.set(getKey(JOBS, jobId), job);
 		int[] jobletReferences = new int[job.getJoblets().size()];
-		for (int i = 0; i < jobletReferences.length; ++i)
-		{
+		for (int i = 0; i < jobletReferences.length; ++i) {
 			Joblet joblet = job.getJoblets().get(i);
 			int jobletId = createId(JOBLETS);
 			joblet.setId(jobletId);
@@ -370,68 +353,64 @@ public class DGridMemcachedTransport implements DGridTransport
 			joblet.setTimeCreated(job.getTimeCreated());
 			mcc.set(getKey(JOBLETS, jobletId), joblet);
 			jobletReferences[i] = jobletId;
-			if (jobletId == 1)
-			{
+			if (jobletId == 1) {
 				// set the work queue counter to at least 1
 				createId(JOBLET_QUEUE);
 			}
 		}
 		// populate job -> joblets reference
 		mcc.set(getKey(JOBLET_REFERENCES, jobId), jobletReferences);
-		return jobId;
+		return job;
 	}
 
-	public int submitJoblet(Joblet joblet, int jobId, int callbackType, String callbackAddress, String callbackContent)
-			throws TransportException, InvalidApiKey, InvalidJobId
-	{
+	public Joblet submitJoblet(Joblet joblet, int jobId, int callbackType,
+			String callbackAddress, String callbackContent)
+			throws TransportException, InvalidApiKey, InvalidJobId {
 		log.trace("submitJoblet()");
-		String queueKey = (joblet.getStatus() == JOB_STATUS.SAVED) ? SAVED_JOBLETS : JOBLETS;
-		String referenceKey = (joblet.getStatus() == JOB_STATUS.SAVED) ? SAVED_JOBLET_REFERENCES : JOBLET_REFERENCES;
-		String queueCounterKey = (joblet.getStatus() == JOB_STATUS.SAVED) ? SAVED_JOBLET_QUEUE : JOBLET_QUEUE;
+		String queueKey = (joblet.getStatus() == JOB_STATUS.SAVED) ? SAVED_JOBLETS
+				: JOBLETS;
+		String referenceKey = (joblet.getStatus() == JOB_STATUS.SAVED) ? SAVED_JOBLET_REFERENCES
+				: JOBLET_REFERENCES;
+		String queueCounterKey = (joblet.getStatus() == JOB_STATUS.SAVED) ? SAVED_JOBLET_QUEUE
+				: JOBLET_QUEUE;
 		int jobletId = createId(queueKey);
 		joblet.setId(jobletId);
 		joblet.setTimeCreated(System.currentTimeMillis());
-		if (jobId == 0)
-		{
+		if (jobId == 0) {
 			// create the job
 			jobId = createId(JOBS);
-			Job job = new Job(jobId, joblet.getTimeCreated(), null, null, null, callbackType, callbackAddress,
-					callbackContent, JOB_STATUS.RECEIVED);
+			Job job = new Job(jobId, joblet.getTimeCreated(), null, null, null,
+					callbackType, callbackAddress, callbackContent,
+					JOB_STATUS.RECEIVED);
 			mcc.set(getKey(JOBS, jobId), job);
 			// populate job -> joblets reference
 			mcc.set(getKey(referenceKey, jobId), new int[] { jobletId });
-		}
-		else
-		{
+		} else {
 			int[] jobletIds = (int[]) mcc.get(getKey(referenceKey, jobId));
 			int[] newJobletIds = new int[jobletIds.length];
-			for (int i = 0; i < jobletIds.length; ++i)
-			{
+			for (int i = 0; i < jobletIds.length; ++i) {
 				newJobletIds[i] = jobletIds[i];
 			}
 			newJobletIds[newJobletIds.length - 1] = jobletId;
 		}
 		joblet.setJobId(jobId);
 		mcc.set(getKey(queueKey, jobletId), joblet);
-		if (jobletId == 1)
-		{
+		if (jobletId == 1) {
 			// set the work queue counter to at least 1
 			createId(queueCounterKey);
 		}
-		return jobletId;
+		return joblet;
 	}
 
-	private List<Joblet> getJoblets(int jobId, String referenceKey) throws InvalidJobId
-	{
+	private List<Joblet> getJoblets(int jobId, String referenceKey)
+			throws InvalidJobId {
 		log.trace("getJoblets()");
 		int[] jobletIds = (int[]) mcc.get(getKey(referenceKey, jobId));
 		if (jobletIds == null)
 			throw new InvalidJobId();
-		else
-		{
+		else {
 			List<Joblet> joblets = new ArrayList<Joblet>(jobletIds.length);
-			for (int i = 0; i < jobletIds.length; ++i)
-			{
+			for (int i = 0; i < jobletIds.length; ++i) {
 				Joblet joblet = (Joblet) mcc.get(getKey(JOBLETS, jobletIds[i]));
 				joblets.add(joblet);
 			}
@@ -440,26 +419,22 @@ public class DGridMemcachedTransport implements DGridTransport
 
 	}
 
-	private int getId(String classification)
-	{
+	private int getId(String classification) {
 		log.trace("getId()");
 		return (int) mcc.getCounter(getKey(classification, "counter"));
 	}
 
-	private int createId(String classification)
-	{
+	private int createId(String classification) {
 		log.trace("createId()");
 		String key = getKey(classification, "counter");
 		return (int) mcc.addOrIncr(key, 1l);
 	}
 
-	private String getKey(String classification, int id)
-	{
+	private String getKey(String classification, int id) {
 		return getKey(classification, Integer.toString(id));
 	}
 
-	private String getKey(String classification, String id)
-	{
+	private String getKey(String classification, String id) {
 		return String.format("dgrid.%1$s.%2$s", classification, id);
 	}
 }

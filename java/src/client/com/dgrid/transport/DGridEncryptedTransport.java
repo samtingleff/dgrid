@@ -5,6 +5,7 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,6 +87,11 @@ public class DGridEncryptedTransport implements DGridTransport {
 		delegate.setHostFacts(hostid, facts);
 	}
 
+	public Host getHost(int id) throws TransportException, InvalidApiKey,
+			InvalidHost {
+		return delegate.getHost(id);
+	}
+
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost {
 		return delegate.getHostByName(hostname);
@@ -115,6 +121,16 @@ public class DGridEncryptedTransport implements DGridTransport {
 		return delegate.getJobletQueueSize();
 	}
 
+	public List<Joblet> listActiveJoblets(String submitter, int offset,
+			int limit) throws TransportException, InvalidApiKey {
+		List<Joblet> joblets = delegate.listActiveJoblets(submitter, offset,
+				limit);
+		for (Joblet joblet : joblets) {
+			decryptJoblet(joblet);
+		}
+		return joblets;
+	}
+
 	public JobletResult getJobletResult(int jobletId)
 			throws TransportException, InvalidApiKey, InvalidJobletId {
 		return delegate.getJobletResult(jobletId);
@@ -125,7 +141,7 @@ public class DGridEncryptedTransport implements DGridTransport {
 		return delegate.getResults(jobId);
 	}
 
-	public int submitJob(Job job) throws TransportException, InvalidApiKey {
+	public Job submitJob(Job job) throws TransportException, InvalidApiKey {
 		List<Joblet> joblets = job.getJoblets();
 		for (Joblet joblet : joblets) {
 			signJoblet(joblet);
@@ -134,7 +150,7 @@ public class DGridEncryptedTransport implements DGridTransport {
 		return delegate.submitJob(job);
 	}
 
-	public int submitJoblet(Joblet joblet, int jobId, int callbackType,
+	public Joblet submitJoblet(Joblet joblet, int jobId, int callbackType,
 			String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId {
 		signJoblet(joblet);

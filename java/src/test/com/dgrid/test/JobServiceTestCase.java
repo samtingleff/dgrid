@@ -52,7 +52,7 @@ public class JobServiceTestCase extends TestCase {
 	public void testHostFacts() throws Exception {
 		Host host1 = jobService.registerHost(apiKey, hostname);
 		assertNotNull(host1.getId());
-		Host host2 = jobService.getHost(apiKey, hostname);
+		Host host2 = jobService.getHostByName(apiKey, hostname);
 		assertEquals(host1.getId(), host2.getId());
 
 		// set some facts
@@ -62,7 +62,7 @@ public class JobServiceTestCase extends TestCase {
 		facts.put("test.fact.3", "test.value.3");
 		jobService.setHostFacts(apiKey, host2.getId(), facts);
 
-		Host host3 = jobService.getHost(apiKey, hostname);
+		Host host3 = jobService.getHostByName(apiKey, hostname);
 		Map<String, String> hostFacts = host3.getFacts();
 		assertTrue(hostFacts.size() >= 3);
 		for (String key : facts.keySet()) {
@@ -90,7 +90,7 @@ public class JobServiceTestCase extends TestCase {
 	public void testSubmitJoblet() throws Exception {
 		Joblet joblet = createJoblet();
 		int jobletId = jobService.submitJoblet(apiKey, joblet, 0,
-				JOB_CALLBACK_TYPES.NONE, null, null);
+				JOB_CALLBACK_TYPES.NONE, null, null).getId();
 
 		joblet = jobService.getWork(apiKey, host.getId());
 		assertEquals(joblet.getId(), jobletId);
@@ -108,7 +108,7 @@ public class JobServiceTestCase extends TestCase {
 		joblets.add(joblet1);
 		Job job = new Job(0, 0l, submitter, "My first job", joblets,
 				JOB_CALLBACK_TYPES.NONE, "", "", JOB_STATUS.RECEIVED);
-		int jobId = jobService.submitJob(apiKey, job);
+		int jobId = jobService.submitJob(apiKey, job).getId();
 
 		// sleep to guarantee second job comes after first
 		Thread.sleep(500);

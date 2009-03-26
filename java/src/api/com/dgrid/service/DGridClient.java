@@ -15,13 +15,16 @@ public interface DGridClient extends DGridTransport {
 
 	public Host getHost() throws TransportException, InvalidApiKey, InvalidHost;
 
-	public int submitJoblet(Joblet joblet, int jobId)
+	public Host getHost(int id) throws TransportException, InvalidApiKey,
+			InvalidHost;
+
+	public Joblet submitJoblet(Joblet joblet, int jobId)
 			throws TransportException, InvalidApiKey, InvalidJobId;
 
-	public int submitHostJoblet(String hostname, Joblet joblet, int jobId)
+	public Joblet submitHostJoblet(String hostname, Joblet joblet, int jobId)
 			throws TransportException, InvalidApiKey, InvalidJobId, InvalidHost;
 
-	public int submitHostJoblet(String hostname, Joblet joblet, int jobId,
+	public Joblet submitHostJoblet(String hostname, Joblet joblet, int jobId,
 			int callbackType, String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId, InvalidHost;
 

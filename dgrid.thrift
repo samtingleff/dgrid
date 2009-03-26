@@ -111,7 +111,10 @@ service JobService {
   Host registerHost(1:string apiKey, 2:string hostname)
     throws (1:InvalidApiKey apiKeyException),
 
-  Host getHost(1:string apiKey, 2:string hostname)
+  Host getHost(1:string apiKey, 2:i32 id)
+    throws (1:InvalidApiKey apiKeyException, 2:InvalidHost hostException),
+
+  Host getHostByName(1:string apiKey, 2:string hostname)
     throws (1:InvalidApiKey apiKeyException, 2:InvalidHost hostException),
 
   void setHostFacts(1:string apiKey, 2:i32 hostid, 3:map<string, string> facts)
@@ -128,11 +131,11 @@ service JobService {
     throws (1:InvalidApiKey apiKeyException, 2:NoHostAvailable hostException),
 
   // submit a job
-  i32 submitJob(1:string apiKey, 2:Job job)
+  Job submitJob(1:string apiKey, 2:Job job)
     throws (1:InvalidApiKey apiKeyException),
 
   // shortcut to submit a single joblet, or append a joblet to an existing job
-  i32 submitJoblet(
+  Joblet submitJoblet(
     1:string apiKey, 2:Joblet joblet, 3:i32 jobId,
     4:JOB_CALLBACK_TYPES callbackType, 5:string callbackAddress,
     6:string callbackContent)
@@ -174,6 +177,11 @@ service JobService {
 
   // get queue size
   i32 getJobletQueueSize(1:string apiKey)
+    throws (1:InvalidApiKey apiKeyException),
+
+  // list active joblets (with optional submitter param)
+  list<Joblet> listActiveJoblets(1:string apiKey,
+    2:string submitter, 3:i32 offset, 4:i32 limit)
     throws (1:InvalidApiKey apiKeyException),
 
   // log something

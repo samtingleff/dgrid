@@ -15,7 +15,7 @@ public class SendRestartTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.AGENT_RESTART_JOBLET, "Shutdown agent", params, "",
 				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitHostJoblet(getHostname(), joblet, 0);
+		int jobletId = gridClient.submitHostJoblet(getHostname(), joblet, 0).getId();
 		super.doWork();
 	}
 }

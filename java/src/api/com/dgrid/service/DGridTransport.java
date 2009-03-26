@@ -27,6 +27,9 @@ public interface DGridTransport {
 	public Host registerHost(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost;
 
+	public Host getHost(int id) throws TransportException, InvalidApiKey,
+			InvalidHost;
+
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost;
 
@@ -42,9 +45,9 @@ public interface DGridTransport {
 	public void log(int jobletId, int jobletStatus, String message)
 			throws TransportException, InvalidApiKey, InvalidJobletId;
 
-	public int submitJob(Job job) throws TransportException, InvalidApiKey;
+	public Job submitJob(Job job) throws TransportException, InvalidApiKey;
 
-	public int submitJoblet(Joblet joblet, int jobId, int callbackType,
+	public Joblet submitJoblet(Joblet joblet, int jobId, int callbackType,
 			String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId;
 
@@ -72,4 +75,6 @@ public interface DGridTransport {
 
 	public int getJobletQueueSize() throws TransportException, InvalidApiKey;
 
+	public List<Joblet> listActiveJoblets(String submitter, int offset,
+			int limit) throws TransportException, InvalidApiKey;
 }

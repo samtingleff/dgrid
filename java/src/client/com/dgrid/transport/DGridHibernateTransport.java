@@ -165,6 +165,18 @@ public class DGridHibernateTransport implements DGridTransport {
 		}
 	}
 
+	public Host getHost(int id) throws TransportException, InvalidApiKey,
+			InvalidHost {
+		log.trace("getHostByName()");
+		Criteria crit = queryDAO.createCriteria(Host.class);
+		crit.add(Restrictions.eq("id", id));
+		Host host = (Host) crit.uniqueResult();
+		if (host == null) {
+			throw new InvalidHost();
+		}
+		return host;
+	}
+
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost {
 		log.trace("getHostByName()");
@@ -230,6 +242,21 @@ public class DGridHibernateTransport implements DGridTransport {
 		crit.add(Restrictions.eq("status", JOB_STATUS.RECEIVED));
 		crit.setProjection(Projections.rowCount());
 		return ((Integer) crit.list().get(0)).intValue();
+	}
+
+	public List<Joblet> listActiveJoblets(String submitter, int offset,
+			int limit) throws TransportException, InvalidApiKey {
+		log.trace("listActiveJoblets()");
+		Criteria crit = queryDAO.createCriteria(Joblet.class);
+		crit.add(Restrictions.and(Restrictions.ne("status",
+				JOB_STATUS.COMPLETED), Restrictions.ne("status",
+				JOB_STATUS.FAILED)));
+		if (submitter != null) {
+			crit.add(Restrictions.eq("submitter", submitter));
+		}
+		crit.addOrder(Order.asc("jobId"));
+		crit.addOrder(Order.asc("id"));
+		return crit.list();
 	}
 
 	public JobletResult getJobletResult(int jobletId)
@@ -358,7 +385,7 @@ public class DGridHibernateTransport implements DGridTransport {
 		dao.update(host);
 	}
 
-	public int submitJob(Job job) throws TransportException, InvalidApiKey {
+	public Job submitJob(Job job) throws TransportException, InvalidApiKey {
 		log.trace("submitJob()");
 		List<Joblet> joblets = new LinkedList<Joblet>();
 		for (Joblet joblet : job.getJoblets()) {
@@ -369,10 +396,10 @@ public class DGridHibernateTransport implements DGridTransport {
 		}
 		job.setJoblets(joblets);
 		job = (Job) dao.create(job);
-		return job.getId();
+		return job;
 	}
 
-	public int submitJoblet(Joblet joblet, int jobId, int callbackType,
+	public Joblet submitJoblet(Joblet joblet, int jobId, int callbackType,
 			String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId {
 		log.trace("submitJoblet()");
@@ -395,7 +422,7 @@ public class DGridHibernateTransport implements DGridTransport {
 		joblet.setTimeCreated(System.currentTimeMillis());
 		joblet = (Joblet) dao.create(joblet);
 		dao.update(job);
-		return (jobId == 0) ? job.getId() : joblet.getId();
+		return joblet;
 	}
 
 	private Joblet readJoblet(int id) throws InvalidJobletId {

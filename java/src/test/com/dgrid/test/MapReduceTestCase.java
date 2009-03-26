@@ -33,7 +33,7 @@ public class MapReduceTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVA_MR_JOB, "Sample m/r job", params, sb.toString(),
 				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -58,7 +58,7 @@ public class MapReduceTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_MR_JOB, "Sample groovy m/r job", params, "",
 				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		JobletResult result = null;
 		try {

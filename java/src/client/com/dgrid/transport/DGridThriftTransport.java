@@ -68,6 +68,24 @@ public class DGridThriftTransport implements DGridTransport {
 		this.hostname = HostnameDiscovery.getHostname();
 	}
 
+	public Host getHost(int id) throws TransportException, InvalidApiKey,
+			InvalidHost {
+		log.trace("getHost()");
+		TConnection conn = null;
+		try {
+			conn = connect();
+			Host host = conn.jobService.getHost(apiKey, id);
+			return host;
+		} catch (TException e) {
+			log
+					.error(String.format("TException in getHost(%1$s)",
+							hostname), e);
+			throw (new TransportException(e));
+		} finally {
+			disconnect(conn);
+		}
+	}
+
 	public Host getHostByName(String hostname) throws TransportException,
 			InvalidApiKey, InvalidHost {
 		log.trace("getHostByName()");
@@ -217,13 +235,13 @@ public class DGridThriftTransport implements DGridTransport {
 		}
 	}
 
-	public int submitJob(Job job) throws TransportException, InvalidApiKey {
+	public Job submitJob(Job job) throws TransportException, InvalidApiKey {
 		log.trace("submitJob()");
 		TConnection conn = null;
 		try {
 			conn = connect();
-			int jobid = conn.jobService.submitJob(apiKey, job);
-			return jobid;
+			Job j = conn.jobService.submitJob(apiKey, job);
+			return j;
 		} catch (TException e) {
 			log.error("TException in submitJob()", e);
 			throw (new TransportException(e));
@@ -232,16 +250,16 @@ public class DGridThriftTransport implements DGridTransport {
 		}
 	}
 
-	public int submitJoblet(Joblet joblet, int jobId, int callbackType,
+	public Joblet submitJoblet(Joblet joblet, int jobId, int callbackType,
 			String callbackAddress, String callbackContent)
 			throws TransportException, InvalidApiKey, InvalidJobId {
 		log.trace("submitJoblet()");
 		TConnection conn = null;
 		try {
 			conn = connect();
-			int jobletId = conn.jobService.submitJoblet(apiKey, joblet, jobId,
+			Joblet j = conn.jobService.submitJoblet(apiKey, joblet, jobId,
 					callbackType, callbackAddress, callbackContent);
-			return jobletId;
+			return j;
 		} catch (TException e) {
 			log.error("TException in submitJoblet()", e);
 			throw (new TransportException(e));
@@ -377,6 +395,23 @@ public class DGridThriftTransport implements DGridTransport {
 		}
 	}
 
+	public List<Joblet> listActiveJoblets(String submitter, int offset,
+			int limit) throws TransportException, InvalidApiKey {
+		log.trace("listActiveJoblets()");
+		TConnection conn = null;
+		try {
+			conn = connect();
+			List<Joblet> joblets = conn.jobService.listActiveJoblets(apiKey,
+					submitter, offset, limit);
+			return joblets;
+		} catch (TException e) {
+			log.error("TException in getJobletQueueSize()", e);
+			throw (new TransportException(e));
+		} finally {
+			disconnect(conn);
+		}
+	}
+
 	private int getHostIdCached(TConnection conn) throws InvalidApiKey,
 			TException, InvalidHost {
 		int retval = 0;
@@ -395,7 +430,7 @@ public class DGridThriftTransport implements DGridTransport {
 		TTransportException e = null;
 		for (int i = 0; i < RETRIES; ++i) {
 			try {
-				Host host = conn.jobService.getHost(apiKey, hostname);
+				Host host = conn.jobService.getHostByName(apiKey, hostname);
 				return host;
 			} catch (TTransportException tte) {
 				e = tte;

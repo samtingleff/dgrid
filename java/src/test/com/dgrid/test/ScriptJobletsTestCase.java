@@ -20,7 +20,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Sample groovy joblet", params, "",
 				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -52,7 +52,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Sample groovy joblet", params, code,
 				JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -70,7 +70,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Sample groovy joblet",
 				new HashMap<String, String>(0), code, JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -87,7 +87,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Sample groovy joblet", params, code,
 				JOB_STATUS.RECEIVED);
-		jobletId = gridClient.submitJoblet(joblet, 0);
+		jobletId = gridClient.submitJoblet(joblet, 0).getId();
 		JobletResult result4 = super.doWork();
 
 		// get it back
@@ -99,7 +99,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.GROOVY_JOBLET, "Sample groovy joblet", params, code
 						+ "jasdfsdfasdf {} (([[[", JOB_STATUS.RECEIVED);
-		jobletId = gridClient.submitJoblet(joblet, 0);
+		jobletId = gridClient.submitJoblet(joblet, 0).getId();
 		JobletResult result6 = super.doWork();
 
 		// get it back
@@ -118,7 +118,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVASCRIPT_JOBLET, "Sample javascript joblet",
 				params, "", JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -148,7 +148,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVASCRIPT_JOBLET, "Sample javascript joblet",
 				params, code, JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);
@@ -168,7 +168,7 @@ public class ScriptJobletsTestCase extends BaseTestCase {
 		Joblet joblet = new Joblet(0, 0l, 0, 0, getHostname(), 1,
 				Constants.JAVASCRIPT_JOBLET, "Sample javascript joblet",
 				params, code, JOB_STATUS.RECEIVED);
-		int jobletId = gridClient.submitJoblet(joblet, 0);
+		int jobletId = gridClient.submitJoblet(joblet, 0).getId();
 
 		// work it
 		Thread.sleep(1);

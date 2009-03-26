@@ -22,7 +22,9 @@ public class JobService {
 
     public Host registerHost(String apiKey, String hostname) throws InvalidApiKey, TException;
 
-    public Host getHost(String apiKey, String hostname) throws InvalidApiKey, InvalidHost, TException;
+    public Host getHost(String apiKey, int id) throws InvalidApiKey, InvalidHost, TException;
+
+    public Host getHostByName(String apiKey, String hostname) throws InvalidApiKey, InvalidHost, TException;
 
     public void setHostFacts(String apiKey, int hostid, Map<String,String> facts) throws InvalidApiKey, InvalidHost, TException;
 
@@ -32,9 +34,9 @@ public class JobService {
 
     public Host getSyncJobServiceHost(String apiKey) throws InvalidApiKey, NoHostAvailable, TException;
 
-    public int submitJob(String apiKey, Job job) throws InvalidApiKey, TException;
+    public Job submitJob(String apiKey, Job job) throws InvalidApiKey, TException;
 
-    public int submitJoblet(String apiKey, Joblet joblet, int jobId, int callbackType, String callbackAddress, String callbackContent) throws InvalidApiKey, InvalidJobId, TException;
+    public Joblet submitJoblet(String apiKey, Joblet joblet, int jobId, int callbackType, String callbackAddress, String callbackContent) throws InvalidApiKey, InvalidJobId, TException;
 
     public Job getJob(String apiKey, int jobId) throws InvalidApiKey, InvalidJobId, TException;
 
@@ -49,6 +51,8 @@ public class JobService {
     public void releaseJoblet(String apiKey, int hostid, int jobletId) throws InvalidApiKey, InvalidJobletId, TException;
 
     public int getJobletQueueSize(String apiKey) throws InvalidApiKey, TException;
+
+    public List<Joblet> listActiveJoblets(String apiKey, String submitter, int offset, int limit) throws InvalidApiKey, TException;
 
     public void log(String apiKey, int hostid, int jobletId, int status, String message) throws InvalidApiKey, InvalidJobletId, TException;
 
@@ -118,18 +122,18 @@ public class JobService {
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "registerHost failed: unknown result");
     }
 
-    public Host getHost(String apiKey, String hostname) throws InvalidApiKey, InvalidHost, TException
+    public Host getHost(String apiKey, int id) throws InvalidApiKey, InvalidHost, TException
     {
-      send_getHost(apiKey, hostname);
+      send_getHost(apiKey, id);
       return recv_getHost();
     }
 
-    public void send_getHost(String apiKey, String hostname) throws TException
+    public void send_getHost(String apiKey, int id) throws TException
     {
       oprot_.writeMessageBegin(new TMessage("getHost", TMessageType.CALL, seqid_));
       getHost_args args = new getHost_args();
       args.apiKey = apiKey;
-      args.hostname = hostname;
+      args.id = id;
       args.write(oprot_);
       oprot_.writeMessageEnd();
       oprot_.getTransport().flush();
@@ -156,6 +160,46 @@ public class JobService {
         throw result.hostException;
       }
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "getHost failed: unknown result");
+    }
+
+    public Host getHostByName(String apiKey, String hostname) throws InvalidApiKey, InvalidHost, TException
+    {
+      send_getHostByName(apiKey, hostname);
+      return recv_getHostByName();
+    }
+
+    public void send_getHostByName(String apiKey, String hostname) throws TException
+    {
+      oprot_.writeMessageBegin(new TMessage("getHostByName", TMessageType.CALL, seqid_));
+      getHostByName_args args = new getHostByName_args();
+      args.apiKey = apiKey;
+      args.hostname = hostname;
+      args.write(oprot_);
+      oprot_.writeMessageEnd();
+      oprot_.getTransport().flush();
+    }
+
+    public Host recv_getHostByName() throws InvalidApiKey, InvalidHost, TException
+    {
+      TMessage msg = iprot_.readMessageBegin();
+      if (msg.type == TMessageType.EXCEPTION) {
+        TApplicationException x = TApplicationException.read(iprot_);
+        iprot_.readMessageEnd();
+        throw x;
+      }
+      getHostByName_result result = new getHostByName_result();
+      result.read(iprot_);
+      iprot_.readMessageEnd();
+      if (result.__isset.success) {
+        return result.success;
+      }
+      if (result.__isset.apiKeyException) {
+        throw result.apiKeyException;
+      }
+      if (result.__isset.hostException) {
+        throw result.hostException;
+      }
+      throw new TApplicationException(TApplicationException.MISSING_RESULT, "getHostByName failed: unknown result");
     }
 
     public void setHostFacts(String apiKey, int hostid, Map<String,String> facts) throws InvalidApiKey, InvalidHost, TException
@@ -315,7 +359,7 @@ public class JobService {
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "getSyncJobServiceHost failed: unknown result");
     }
 
-    public int submitJob(String apiKey, Job job) throws InvalidApiKey, TException
+    public Job submitJob(String apiKey, Job job) throws InvalidApiKey, TException
     {
       send_submitJob(apiKey, job);
       return recv_submitJob();
@@ -332,7 +376,7 @@ public class JobService {
       oprot_.getTransport().flush();
     }
 
-    public int recv_submitJob() throws InvalidApiKey, TException
+    public Job recv_submitJob() throws InvalidApiKey, TException
     {
       TMessage msg = iprot_.readMessageBegin();
       if (msg.type == TMessageType.EXCEPTION) {
@@ -352,7 +396,7 @@ public class JobService {
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "submitJob failed: unknown result");
     }
 
-    public int submitJoblet(String apiKey, Joblet joblet, int jobId, int callbackType, String callbackAddress, String callbackContent) throws InvalidApiKey, InvalidJobId, TException
+    public Joblet submitJoblet(String apiKey, Joblet joblet, int jobId, int callbackType, String callbackAddress, String callbackContent) throws InvalidApiKey, InvalidJobId, TException
     {
       send_submitJoblet(apiKey, joblet, jobId, callbackType, callbackAddress, callbackContent);
       return recv_submitJoblet();
@@ -373,7 +417,7 @@ public class JobService {
       oprot_.getTransport().flush();
     }
 
-    public int recv_submitJoblet() throws InvalidApiKey, InvalidJobId, TException
+    public Joblet recv_submitJoblet() throws InvalidApiKey, InvalidJobId, TException
     {
       TMessage msg = iprot_.readMessageBegin();
       if (msg.type == TMessageType.EXCEPTION) {
@@ -673,6 +717,45 @@ public class JobService {
       throw new TApplicationException(TApplicationException.MISSING_RESULT, "getJobletQueueSize failed: unknown result");
     }
 
+    public List<Joblet> listActiveJoblets(String apiKey, String submitter, int offset, int limit) throws InvalidApiKey, TException
+    {
+      send_listActiveJoblets(apiKey, submitter, offset, limit);
+      return recv_listActiveJoblets();
+    }
+
+    public void send_listActiveJoblets(String apiKey, String submitter, int offset, int limit) throws TException
+    {
+      oprot_.writeMessageBegin(new TMessage("listActiveJoblets", TMessageType.CALL, seqid_));
+      listActiveJoblets_args args = new listActiveJoblets_args();
+      args.apiKey = apiKey;
+      args.submitter = submitter;
+      args.offset = offset;
+      args.limit = limit;
+      args.write(oprot_);
+      oprot_.writeMessageEnd();
+      oprot_.getTransport().flush();
+    }
+
+    public List<Joblet> recv_listActiveJoblets() throws InvalidApiKey, TException
+    {
+      TMessage msg = iprot_.readMessageBegin();
+      if (msg.type == TMessageType.EXCEPTION) {
+        TApplicationException x = TApplicationException.read(iprot_);
+        iprot_.readMessageEnd();
+        throw x;
+      }
+      listActiveJoblets_result result = new listActiveJoblets_result();
+      result.read(iprot_);
+      iprot_.readMessageEnd();
+      if (result.__isset.success) {
+        return result.success;
+      }
+      if (result.__isset.apiKeyException) {
+        throw result.apiKeyException;
+      }
+      throw new TApplicationException(TApplicationException.MISSING_RESULT, "listActiveJoblets failed: unknown result");
+    }
+
     public void log(String apiKey, int hostid, int jobletId, int status, String message) throws InvalidApiKey, InvalidJobletId, TException
     {
       send_log(apiKey, hostid, jobletId, status, message);
@@ -720,6 +803,7 @@ public class JobService {
       iface_ = iface;
       processMap_.put("registerHost", new registerHost());
       processMap_.put("getHost", new getHost());
+      processMap_.put("getHostByName", new getHostByName());
       processMap_.put("setHostFacts", new setHostFacts());
       processMap_.put("getSetting", new getSetting());
       processMap_.put("getHostSetting", new getHostSetting());
@@ -733,6 +817,7 @@ public class JobService {
       processMap_.put("completeJoblet", new completeJoblet());
       processMap_.put("releaseJoblet", new releaseJoblet());
       processMap_.put("getJobletQueueSize", new getJobletQueueSize());
+      processMap_.put("listActiveJoblets", new listActiveJoblets());
       processMap_.put("log", new log());
     }
 
@@ -791,7 +876,7 @@ public class JobService {
         iprot.readMessageEnd();
         getHost_result result = new getHost_result();
         try {
-          result.success = iface_.getHost(args.apiKey, args.hostname);
+          result.success = iface_.getHost(args.apiKey, args.id);
           result.__isset.success = true;
         } catch (InvalidApiKey apiKeyException) {
           result.apiKeyException = apiKeyException;
@@ -801,6 +886,31 @@ public class JobService {
           result.__isset.hostException = true;
         }
         oprot.writeMessageBegin(new TMessage("getHost", TMessageType.REPLY, seqid));
+        result.write(oprot);
+        oprot.writeMessageEnd();
+        oprot.getTransport().flush();
+      }
+
+    }
+
+    private class getHostByName implements ProcessFunction {
+      public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
+      {
+        getHostByName_args args = new getHostByName_args();
+        args.read(iprot);
+        iprot.readMessageEnd();
+        getHostByName_result result = new getHostByName_result();
+        try {
+          result.success = iface_.getHostByName(args.apiKey, args.hostname);
+          result.__isset.success = true;
+        } catch (InvalidApiKey apiKeyException) {
+          result.apiKeyException = apiKeyException;
+          result.__isset.apiKeyException = true;
+        } catch (InvalidHost hostException) {
+          result.hostException = hostException;
+          result.__isset.hostException = true;
+        }
+        oprot.writeMessageBegin(new TMessage("getHostByName", TMessageType.REPLY, seqid));
         result.write(oprot);
         oprot.writeMessageEnd();
         oprot.getTransport().flush();
@@ -1117,6 +1227,28 @@ public class JobService {
           result.__isset.apiKeyException = true;
         }
         oprot.writeMessageBegin(new TMessage("getJobletQueueSize", TMessageType.REPLY, seqid));
+        result.write(oprot);
+        oprot.writeMessageEnd();
+        oprot.getTransport().flush();
+      }
+
+    }
+
+    private class listActiveJoblets implements ProcessFunction {
+      public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
+      {
+        listActiveJoblets_args args = new listActiveJoblets_args();
+        args.read(iprot);
+        iprot.readMessageEnd();
+        listActiveJoblets_result result = new listActiveJoblets_result();
+        try {
+          result.success = iface_.listActiveJoblets(args.apiKey, args.submitter, args.offset, args.limit);
+          result.__isset.success = true;
+        } catch (InvalidApiKey apiKeyException) {
+          result.apiKeyException = apiKeyException;
+          result.__isset.apiKeyException = true;
+        }
+        oprot.writeMessageBegin(new TMessage("listActiveJoblets", TMessageType.REPLY, seqid));
         result.write(oprot);
         oprot.writeMessageEnd();
         oprot.getTransport().flush();
@@ -1478,12 +1610,12 @@ public class JobService {
 
   public static class getHost_args implements TBase, java.io.Serializable   {
     private String apiKey;
-    private String hostname;
+    private int id;
 
     public final Isset __isset = new Isset();
     public static final class Isset implements java.io.Serializable {
       public boolean apiKey = false;
-      public boolean hostname = false;
+      public boolean id = false;
     }
 
     public getHost_args() {
@@ -1491,13 +1623,13 @@ public class JobService {
 
     public getHost_args(
       String apiKey,
-      String hostname)
+      int id)
     {
       this();
       this.apiKey = apiKey;
       this.__isset.apiKey = true;
-      this.hostname = hostname;
-      this.__isset.hostname = true;
+      this.id = id;
+      this.__isset.id = true;
     }
 
     public String getApiKey() {
@@ -1513,17 +1645,17 @@ public class JobService {
       this.__isset.apiKey = false;
     }
 
-    public String getHostname() {
-      return this.hostname;
+    public int getId() {
+      return this.id;
     }
 
-    public void setHostname(String hostname) {
-      this.hostname = hostname;
-      this.__isset.hostname = true;
+    public void setId(int id) {
+      this.id = id;
+      this.__isset.id = true;
     }
 
-    public void unsetHostname() {
-      this.__isset.hostname = false;
+    public void unsetId() {
+      this.__isset.id = false;
     }
 
     public boolean equals(Object that) {
@@ -1547,12 +1679,12 @@ public class JobService {
           return false;
       }
 
-      boolean this_present_hostname = true && (this.hostname != null);
-      boolean that_present_hostname = true && (that.hostname != null);
-      if (this_present_hostname || that_present_hostname) {
-        if (!(this_present_hostname && that_present_hostname))
+      boolean this_present_id = true;
+      boolean that_present_id = true;
+      if (this_present_id || that_present_id) {
+        if (!(this_present_id && that_present_id))
           return false;
-        if (!this.hostname.equals(that.hostname))
+        if (this.id != that.id)
           return false;
       }
 
@@ -1583,9 +1715,9 @@ public class JobService {
             }
             break;
           case 2:
-            if (field.type == TType.STRING) {
-              this.hostname = iprot.readString();
-              this.__isset.hostname = true;
+            if (field.type == TType.I32) {
+              this.id = iprot.readI32();
+              this.__isset.id = true;
             } else { 
               TProtocolUtil.skip(iprot, field.type);
             }
@@ -1611,14 +1743,12 @@ public class JobService {
         oprot.writeString(this.apiKey);
         oprot.writeFieldEnd();
       }
-      if (this.hostname != null) {
-        field.name = "hostname";
-        field.type = TType.STRING;
-        field.id = 2;
-        oprot.writeFieldBegin(field);
-        oprot.writeString(this.hostname);
-        oprot.writeFieldEnd();
-      }
+      field.name = "id";
+      field.type = TType.I32;
+      field.id = 2;
+      oprot.writeFieldBegin(field);
+      oprot.writeI32(this.id);
+      oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -1627,8 +1757,8 @@ public class JobService {
       StringBuilder sb = new StringBuilder("getHost_args(");
       sb.append("apiKey:");
       sb.append(this.apiKey);
-      sb.append(",hostname:");
-      sb.append(this.hostname);
+      sb.append(",id:");
+      sb.append(this.id);
       sb.append(")");
       return sb.toString();
     }
@@ -1838,6 +1968,380 @@ public class JobService {
 
     public String toString() {
       StringBuilder sb = new StringBuilder("getHost_result(");
+      sb.append("success:");
+      sb.append(this.success);
+      sb.append(",apiKeyException:");
+      sb.append(this.apiKeyException);
+      sb.append(",hostException:");
+      sb.append(this.hostException);
+      sb.append(")");
+      return sb.toString();
+    }
+
+  }
+
+  public static class getHostByName_args implements TBase, java.io.Serializable   {
+    private String apiKey;
+    private String hostname;
+
+    public final Isset __isset = new Isset();
+    public static final class Isset implements java.io.Serializable {
+      public boolean apiKey = false;
+      public boolean hostname = false;
+    }
+
+    public getHostByName_args() {
+    }
+
+    public getHostByName_args(
+      String apiKey,
+      String hostname)
+    {
+      this();
+      this.apiKey = apiKey;
+      this.__isset.apiKey = true;
+      this.hostname = hostname;
+      this.__isset.hostname = true;
+    }
+
+    public String getApiKey() {
+      return this.apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+      this.apiKey = apiKey;
+      this.__isset.apiKey = true;
+    }
+
+    public void unsetApiKey() {
+      this.__isset.apiKey = false;
+    }
+
+    public String getHostname() {
+      return this.hostname;
+    }
+
+    public void setHostname(String hostname) {
+      this.hostname = hostname;
+      this.__isset.hostname = true;
+    }
+
+    public void unsetHostname() {
+      this.__isset.hostname = false;
+    }
+
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getHostByName_args)
+        return this.equals((getHostByName_args)that);
+      return false;
+    }
+
+    public boolean equals(getHostByName_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_apiKey = true && (this.apiKey != null);
+      boolean that_present_apiKey = true && (that.apiKey != null);
+      if (this_present_apiKey || that_present_apiKey) {
+        if (!(this_present_apiKey && that_present_apiKey))
+          return false;
+        if (!this.apiKey.equals(that.apiKey))
+          return false;
+      }
+
+      boolean this_present_hostname = true && (this.hostname != null);
+      boolean that_present_hostname = true && (that.hostname != null);
+      if (this_present_hostname || that_present_hostname) {
+        if (!(this_present_hostname && that_present_hostname))
+          return false;
+        if (!this.hostname.equals(that.hostname))
+          return false;
+      }
+
+      return true;
+    }
+
+    public int hashCode() {
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        switch (field.id)
+        {
+          case 1:
+            if (field.type == TType.STRING) {
+              this.apiKey = iprot.readString();
+              this.__isset.apiKey = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2:
+            if (field.type == TType.STRING) {
+              this.hostname = iprot.readString();
+              this.__isset.hostname = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
+            break;
+        }
+        iprot.readFieldEnd();
+      }
+      iprot.readStructEnd();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      TStruct struct = new TStruct("getHostByName_args");
+      oprot.writeStructBegin(struct);
+      TField field = new TField();
+      if (this.apiKey != null) {
+        field.name = "apiKey";
+        field.type = TType.STRING;
+        field.id = 1;
+        oprot.writeFieldBegin(field);
+        oprot.writeString(this.apiKey);
+        oprot.writeFieldEnd();
+      }
+      if (this.hostname != null) {
+        field.name = "hostname";
+        field.type = TType.STRING;
+        field.id = 2;
+        oprot.writeFieldBegin(field);
+        oprot.writeString(this.hostname);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getHostByName_args(");
+      sb.append("apiKey:");
+      sb.append(this.apiKey);
+      sb.append(",hostname:");
+      sb.append(this.hostname);
+      sb.append(")");
+      return sb.toString();
+    }
+
+  }
+
+  public static class getHostByName_result implements TBase, java.io.Serializable   {
+    private Host success;
+    private InvalidApiKey apiKeyException;
+    private InvalidHost hostException;
+
+    public final Isset __isset = new Isset();
+    public static final class Isset implements java.io.Serializable {
+      public boolean success = false;
+      public boolean apiKeyException = false;
+      public boolean hostException = false;
+    }
+
+    public getHostByName_result() {
+    }
+
+    public getHostByName_result(
+      Host success,
+      InvalidApiKey apiKeyException,
+      InvalidHost hostException)
+    {
+      this();
+      this.success = success;
+      this.__isset.success = true;
+      this.apiKeyException = apiKeyException;
+      this.__isset.apiKeyException = true;
+      this.hostException = hostException;
+      this.__isset.hostException = true;
+    }
+
+    public Host getSuccess() {
+      return this.success;
+    }
+
+    public void setSuccess(Host success) {
+      this.success = success;
+      this.__isset.success = true;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+      this.__isset.success = false;
+    }
+
+    public InvalidApiKey getApiKeyException() {
+      return this.apiKeyException;
+    }
+
+    public void setApiKeyException(InvalidApiKey apiKeyException) {
+      this.apiKeyException = apiKeyException;
+      this.__isset.apiKeyException = true;
+    }
+
+    public void unsetApiKeyException() {
+      this.apiKeyException = null;
+      this.__isset.apiKeyException = false;
+    }
+
+    public InvalidHost getHostException() {
+      return this.hostException;
+    }
+
+    public void setHostException(InvalidHost hostException) {
+      this.hostException = hostException;
+      this.__isset.hostException = true;
+    }
+
+    public void unsetHostException() {
+      this.hostException = null;
+      this.__isset.hostException = false;
+    }
+
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getHostByName_result)
+        return this.equals((getHostByName_result)that);
+      return false;
+    }
+
+    public boolean equals(getHostByName_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && (this.success != null);
+      boolean that_present_success = true && (that.success != null);
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_apiKeyException = true && (this.apiKeyException != null);
+      boolean that_present_apiKeyException = true && (that.apiKeyException != null);
+      if (this_present_apiKeyException || that_present_apiKeyException) {
+        if (!(this_present_apiKeyException && that_present_apiKeyException))
+          return false;
+        if (!this.apiKeyException.equals(that.apiKeyException))
+          return false;
+      }
+
+      boolean this_present_hostException = true && (this.hostException != null);
+      boolean that_present_hostException = true && (that.hostException != null);
+      if (this_present_hostException || that_present_hostException) {
+        if (!(this_present_hostException && that_present_hostException))
+          return false;
+        if (!this.hostException.equals(that.hostException))
+          return false;
+      }
+
+      return true;
+    }
+
+    public int hashCode() {
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        switch (field.id)
+        {
+          case 0:
+            if (field.type == TType.STRUCT) {
+              this.success = new Host();
+              this.success.read(iprot);
+              this.__isset.success = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1:
+            if (field.type == TType.STRUCT) {
+              this.apiKeyException = new InvalidApiKey();
+              this.apiKeyException.read(iprot);
+              this.__isset.apiKeyException = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2:
+            if (field.type == TType.STRUCT) {
+              this.hostException = new InvalidHost();
+              this.hostException.read(iprot);
+              this.__isset.hostException = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
+            break;
+        }
+        iprot.readFieldEnd();
+      }
+      iprot.readStructEnd();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      TStruct struct = new TStruct("getHostByName_result");
+      oprot.writeStructBegin(struct);
+      TField field = new TField();
+
+      if (this.__isset.success) {
+        if (this.success != null) {
+          field.name = "success";
+          field.type = TType.STRUCT;
+          field.id = 0;
+          oprot.writeFieldBegin(field);
+          this.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
+      } else if (this.__isset.apiKeyException) {
+        if (this.apiKeyException != null) {
+          field.name = "apiKeyException";
+          field.type = TType.STRUCT;
+          field.id = 1;
+          oprot.writeFieldBegin(field);
+          this.apiKeyException.write(oprot);
+          oprot.writeFieldEnd();
+        }
+      } else if (this.__isset.hostException) {
+        if (this.hostException != null) {
+          field.name = "hostException";
+          field.type = TType.STRUCT;
+          field.id = 2;
+          oprot.writeFieldBegin(field);
+          this.hostException.write(oprot);
+          oprot.writeFieldEnd();
+        }
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getHostByName_result(");
       sb.append("success:");
       sb.append(this.success);
       sb.append(",apiKeyException:");
@@ -3571,7 +4075,7 @@ public class JobService {
   }
 
   public static class submitJob_result implements TBase, java.io.Serializable   {
-    private int success;
+    private Job success;
     private InvalidApiKey apiKeyException;
 
     public final Isset __isset = new Isset();
@@ -3584,7 +4088,7 @@ public class JobService {
     }
 
     public submitJob_result(
-      int success,
+      Job success,
       InvalidApiKey apiKeyException)
     {
       this();
@@ -3594,16 +4098,17 @@ public class JobService {
       this.__isset.apiKeyException = true;
     }
 
-    public int getSuccess() {
+    public Job getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(int success) {
+    public void setSuccess(Job success) {
       this.success = success;
       this.__isset.success = true;
     }
 
     public void unsetSuccess() {
+      this.success = null;
       this.__isset.success = false;
     }
 
@@ -3633,12 +4138,12 @@ public class JobService {
       if (that == null)
         return false;
 
-      boolean this_present_success = true;
-      boolean that_present_success = true;
+      boolean this_present_success = true && (this.success != null);
+      boolean that_present_success = true && (that.success != null);
       if (this_present_success || that_present_success) {
         if (!(this_present_success && that_present_success))
           return false;
-        if (this.success != that.success)
+        if (!this.success.equals(that.success))
           return false;
       }
 
@@ -3670,8 +4175,9 @@ public class JobService {
         switch (field.id)
         {
           case 0:
-            if (field.type == TType.I32) {
-              this.success = iprot.readI32();
+            if (field.type == TType.STRUCT) {
+              this.success = new Job();
+              this.success.read(iprot);
               this.__isset.success = true;
             } else { 
               TProtocolUtil.skip(iprot, field.type);
@@ -3701,12 +4207,14 @@ public class JobService {
       TField field = new TField();
 
       if (this.__isset.success) {
-        field.name = "success";
-        field.type = TType.I32;
-        field.id = 0;
-        oprot.writeFieldBegin(field);
-        oprot.writeI32(this.success);
-        oprot.writeFieldEnd();
+        if (this.success != null) {
+          field.name = "success";
+          field.type = TType.STRUCT;
+          field.id = 0;
+          oprot.writeFieldBegin(field);
+          this.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
       } else if (this.__isset.apiKeyException) {
         if (this.apiKeyException != null) {
           field.name = "apiKeyException";
@@ -4071,7 +4579,7 @@ public class JobService {
   }
 
   public static class submitJoblet_result implements TBase, java.io.Serializable   {
-    private int success;
+    private Joblet success;
     private InvalidApiKey apiKeyException;
     private InvalidJobId jobIdException;
 
@@ -4086,7 +4594,7 @@ public class JobService {
     }
 
     public submitJoblet_result(
-      int success,
+      Joblet success,
       InvalidApiKey apiKeyException,
       InvalidJobId jobIdException)
     {
@@ -4099,16 +4607,17 @@ public class JobService {
       this.__isset.jobIdException = true;
     }
 
-    public int getSuccess() {
+    public Joblet getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(int success) {
+    public void setSuccess(Joblet success) {
       this.success = success;
       this.__isset.success = true;
     }
 
     public void unsetSuccess() {
+      this.success = null;
       this.__isset.success = false;
     }
 
@@ -4152,12 +4661,12 @@ public class JobService {
       if (that == null)
         return false;
 
-      boolean this_present_success = true;
-      boolean that_present_success = true;
+      boolean this_present_success = true && (this.success != null);
+      boolean that_present_success = true && (that.success != null);
       if (this_present_success || that_present_success) {
         if (!(this_present_success && that_present_success))
           return false;
-        if (this.success != that.success)
+        if (!this.success.equals(that.success))
           return false;
       }
 
@@ -4198,8 +4707,9 @@ public class JobService {
         switch (field.id)
         {
           case 0:
-            if (field.type == TType.I32) {
-              this.success = iprot.readI32();
+            if (field.type == TType.STRUCT) {
+              this.success = new Joblet();
+              this.success.read(iprot);
               this.__isset.success = true;
             } else { 
               TProtocolUtil.skip(iprot, field.type);
@@ -4238,12 +4748,14 @@ public class JobService {
       TField field = new TField();
 
       if (this.__isset.success) {
-        field.name = "success";
-        field.type = TType.I32;
-        field.id = 0;
-        oprot.writeFieldBegin(field);
-        oprot.writeI32(this.success);
-        oprot.writeFieldEnd();
+        if (this.success != null) {
+          field.name = "success";
+          field.type = TType.STRUCT;
+          field.id = 0;
+          oprot.writeFieldBegin(field);
+          this.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
       } else if (this.__isset.apiKeyException) {
         if (this.apiKeyException != null) {
           field.name = "apiKeyException";
@@ -6942,6 +7454,450 @@ public class JobService {
 
     public String toString() {
       StringBuilder sb = new StringBuilder("getJobletQueueSize_result(");
+      sb.append("success:");
+      sb.append(this.success);
+      sb.append(",apiKeyException:");
+      sb.append(this.apiKeyException);
+      sb.append(")");
+      return sb.toString();
+    }
+
+  }
+
+  public static class listActiveJoblets_args implements TBase, java.io.Serializable   {
+    private String apiKey;
+    private String submitter;
+    private int offset;
+    private int limit;
+
+    public final Isset __isset = new Isset();
+    public static final class Isset implements java.io.Serializable {
+      public boolean apiKey = false;
+      public boolean submitter = false;
+      public boolean offset = false;
+      public boolean limit = false;
+    }
+
+    public listActiveJoblets_args() {
+    }
+
+    public listActiveJoblets_args(
+      String apiKey,
+      String submitter,
+      int offset,
+      int limit)
+    {
+      this();
+      this.apiKey = apiKey;
+      this.__isset.apiKey = true;
+      this.submitter = submitter;
+      this.__isset.submitter = true;
+      this.offset = offset;
+      this.__isset.offset = true;
+      this.limit = limit;
+      this.__isset.limit = true;
+    }
+
+    public String getApiKey() {
+      return this.apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+      this.apiKey = apiKey;
+      this.__isset.apiKey = true;
+    }
+
+    public void unsetApiKey() {
+      this.__isset.apiKey = false;
+    }
+
+    public String getSubmitter() {
+      return this.submitter;
+    }
+
+    public void setSubmitter(String submitter) {
+      this.submitter = submitter;
+      this.__isset.submitter = true;
+    }
+
+    public void unsetSubmitter() {
+      this.__isset.submitter = false;
+    }
+
+    public int getOffset() {
+      return this.offset;
+    }
+
+    public void setOffset(int offset) {
+      this.offset = offset;
+      this.__isset.offset = true;
+    }
+
+    public void unsetOffset() {
+      this.__isset.offset = false;
+    }
+
+    public int getLimit() {
+      return this.limit;
+    }
+
+    public void setLimit(int limit) {
+      this.limit = limit;
+      this.__isset.limit = true;
+    }
+
+    public void unsetLimit() {
+      this.__isset.limit = false;
+    }
+
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof listActiveJoblets_args)
+        return this.equals((listActiveJoblets_args)that);
+      return false;
+    }
+
+    public boolean equals(listActiveJoblets_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_apiKey = true && (this.apiKey != null);
+      boolean that_present_apiKey = true && (that.apiKey != null);
+      if (this_present_apiKey || that_present_apiKey) {
+        if (!(this_present_apiKey && that_present_apiKey))
+          return false;
+        if (!this.apiKey.equals(that.apiKey))
+          return false;
+      }
+
+      boolean this_present_submitter = true && (this.submitter != null);
+      boolean that_present_submitter = true && (that.submitter != null);
+      if (this_present_submitter || that_present_submitter) {
+        if (!(this_present_submitter && that_present_submitter))
+          return false;
+        if (!this.submitter.equals(that.submitter))
+          return false;
+      }
+
+      boolean this_present_offset = true;
+      boolean that_present_offset = true;
+      if (this_present_offset || that_present_offset) {
+        if (!(this_present_offset && that_present_offset))
+          return false;
+        if (this.offset != that.offset)
+          return false;
+      }
+
+      boolean this_present_limit = true;
+      boolean that_present_limit = true;
+      if (this_present_limit || that_present_limit) {
+        if (!(this_present_limit && that_present_limit))
+          return false;
+        if (this.limit != that.limit)
+          return false;
+      }
+
+      return true;
+    }
+
+    public int hashCode() {
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        switch (field.id)
+        {
+          case 1:
+            if (field.type == TType.STRING) {
+              this.apiKey = iprot.readString();
+              this.__isset.apiKey = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 2:
+            if (field.type == TType.STRING) {
+              this.submitter = iprot.readString();
+              this.__isset.submitter = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 3:
+            if (field.type == TType.I32) {
+              this.offset = iprot.readI32();
+              this.__isset.offset = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 4:
+            if (field.type == TType.I32) {
+              this.limit = iprot.readI32();
+              this.__isset.limit = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
+            break;
+        }
+        iprot.readFieldEnd();
+      }
+      iprot.readStructEnd();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      TStruct struct = new TStruct("listActiveJoblets_args");
+      oprot.writeStructBegin(struct);
+      TField field = new TField();
+      if (this.apiKey != null) {
+        field.name = "apiKey";
+        field.type = TType.STRING;
+        field.id = 1;
+        oprot.writeFieldBegin(field);
+        oprot.writeString(this.apiKey);
+        oprot.writeFieldEnd();
+      }
+      if (this.submitter != null) {
+        field.name = "submitter";
+        field.type = TType.STRING;
+        field.id = 2;
+        oprot.writeFieldBegin(field);
+        oprot.writeString(this.submitter);
+        oprot.writeFieldEnd();
+      }
+      field.name = "offset";
+      field.type = TType.I32;
+      field.id = 3;
+      oprot.writeFieldBegin(field);
+      oprot.writeI32(this.offset);
+      oprot.writeFieldEnd();
+      field.name = "limit";
+      field.type = TType.I32;
+      field.id = 4;
+      oprot.writeFieldBegin(field);
+      oprot.writeI32(this.limit);
+      oprot.writeFieldEnd();
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    public String toString() {
+      StringBuilder sb = new StringBuilder("listActiveJoblets_args(");
+      sb.append("apiKey:");
+      sb.append(this.apiKey);
+      sb.append(",submitter:");
+      sb.append(this.submitter);
+      sb.append(",offset:");
+      sb.append(this.offset);
+      sb.append(",limit:");
+      sb.append(this.limit);
+      sb.append(")");
+      return sb.toString();
+    }
+
+  }
+
+  public static class listActiveJoblets_result implements TBase, java.io.Serializable   {
+    private List<Joblet> success;
+    private InvalidApiKey apiKeyException;
+
+    public final Isset __isset = new Isset();
+    public static final class Isset implements java.io.Serializable {
+      public boolean success = false;
+      public boolean apiKeyException = false;
+    }
+
+    public listActiveJoblets_result() {
+    }
+
+    public listActiveJoblets_result(
+      List<Joblet> success,
+      InvalidApiKey apiKeyException)
+    {
+      this();
+      this.success = success;
+      this.__isset.success = true;
+      this.apiKeyException = apiKeyException;
+      this.__isset.apiKeyException = true;
+    }
+
+    public int getSuccessSize() {
+      return (this.success == null) ? 0 : this.success.size();
+    }
+
+    public java.util.Iterator<Joblet> getSuccessIterator() {
+      return (this.success == null) ? null : this.success.iterator();
+    }
+
+    public void addToSuccess(Joblet elem) {
+      if (this.success == null) {
+        this.success = new ArrayList<Joblet>();
+      }
+      this.success.add(elem);
+      this.__isset.success = true;
+    }
+
+    public List<Joblet> getSuccess() {
+      return this.success;
+    }
+
+    public void setSuccess(List<Joblet> success) {
+      this.success = success;
+      this.__isset.success = true;
+    }
+
+    public void unsetSuccess() {
+      this.success = null;
+      this.__isset.success = false;
+    }
+
+    public InvalidApiKey getApiKeyException() {
+      return this.apiKeyException;
+    }
+
+    public void setApiKeyException(InvalidApiKey apiKeyException) {
+      this.apiKeyException = apiKeyException;
+      this.__isset.apiKeyException = true;
+    }
+
+    public void unsetApiKeyException() {
+      this.apiKeyException = null;
+      this.__isset.apiKeyException = false;
+    }
+
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof listActiveJoblets_result)
+        return this.equals((listActiveJoblets_result)that);
+      return false;
+    }
+
+    public boolean equals(listActiveJoblets_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true && (this.success != null);
+      boolean that_present_success = true && (that.success != null);
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_apiKeyException = true && (this.apiKeyException != null);
+      boolean that_present_apiKeyException = true && (that.apiKeyException != null);
+      if (this_present_apiKeyException || that_present_apiKeyException) {
+        if (!(this_present_apiKeyException && that_present_apiKeyException))
+          return false;
+        if (!this.apiKeyException.equals(that.apiKeyException))
+          return false;
+      }
+
+      return true;
+    }
+
+    public int hashCode() {
+      return 0;
+    }
+
+    public void read(TProtocol iprot) throws TException {
+      TField field;
+      iprot.readStructBegin();
+      while (true)
+      {
+        field = iprot.readFieldBegin();
+        if (field.type == TType.STOP) { 
+          break;
+        }
+        switch (field.id)
+        {
+          case 0:
+            if (field.type == TType.LIST) {
+              {
+                TList _list23 = iprot.readListBegin();
+                this.success = new ArrayList<Joblet>(_list23.size);
+                for (int _i24 = 0; _i24 < _list23.size; ++_i24)
+                {
+                  Joblet _elem25 = new Joblet();
+                  _elem25 = new Joblet();
+                  _elem25.read(iprot);
+                  this.success.add(_elem25);
+                }
+                iprot.readListEnd();
+              }
+              this.__isset.success = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          case 1:
+            if (field.type == TType.STRUCT) {
+              this.apiKeyException = new InvalidApiKey();
+              this.apiKeyException.read(iprot);
+              this.__isset.apiKeyException = true;
+            } else { 
+              TProtocolUtil.skip(iprot, field.type);
+            }
+            break;
+          default:
+            TProtocolUtil.skip(iprot, field.type);
+            break;
+        }
+        iprot.readFieldEnd();
+      }
+      iprot.readStructEnd();
+    }
+
+    public void write(TProtocol oprot) throws TException {
+      TStruct struct = new TStruct("listActiveJoblets_result");
+      oprot.writeStructBegin(struct);
+      TField field = new TField();
+
+      if (this.__isset.success) {
+        if (this.success != null) {
+          field.name = "success";
+          field.type = TType.LIST;
+          field.id = 0;
+          oprot.writeFieldBegin(field);
+          {
+            oprot.writeListBegin(new TList(TType.STRUCT, this.success.size()));
+            for (Joblet _iter26 : this.success)            {
+              _iter26.write(oprot);
+            }
+            oprot.writeListEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+      } else if (this.__isset.apiKeyException) {
+        if (this.apiKeyException != null) {
+          field.name = "apiKeyException";
+          field.type = TType.STRUCT;
+          field.id = 1;
+          oprot.writeFieldBegin(field);
+          this.apiKeyException.write(oprot);
+          oprot.writeFieldEnd();
+        }
+      }
+      oprot.writeFieldStop();
+      oprot.writeStructEnd();
+    }
+
+    public String toString() {
+      StringBuilder sb = new StringBuilder("listActiveJoblets_result(");
       sb.append("success:");
       sb.append(this.success);
       sb.append(",apiKeyException:");
