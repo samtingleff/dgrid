@@ -50,15 +50,6 @@
             init-method="init">
     </bean>
 
-    <!-- jdbc data mover -->
-    <!--
-    <bean
-            id="jdbcTransferHelper"
-            class="com.dgrid.helpers.impl.JdbcTransferHelperImpl"
-            lazy-init="true">
-    </bean>
-    -->
-
     <bean
             id="mailSender"
             class="com.dgrid.helpers.impl.MailSenderImpl"
