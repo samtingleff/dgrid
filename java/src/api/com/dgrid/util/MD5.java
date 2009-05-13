@@ -12,9 +12,8 @@ public class MD5 {
 	}
 
 	public static String md5(byte[] bytes) {
-		MessageDigest md;
 		try {
-			md = MessageDigest.getInstance("MD5");
+			MessageDigest md = MessageDigest.getInstance("MD5");
 			md.update(bytes);
 			return MD5.bufferToHex(md.digest());
 		} catch (NoSuchAlgorithmException e) {
